@@ -229,7 +229,7 @@ class Locus:
     # start,end = ints of the start and end coords of the locus;
     #      end coord is the coord of the last nucleotide.
     def __init__(self,chr,start,end,sense,ID=''):
-        coords = [start,end]
+        coords = [int(start),int(end)]
         coords.sort()
         # this method for assigning chromosome should help avoid storage of
         # redundant strings.
