@@ -90,9 +90,9 @@ def mapBamToGFF(bamFile,gff,sense = '.',extension = 200,rpm = False,clusterGram 
         else:
             bamSense = '.'
         #using the bamLiquidator to get the readstring            
-        print('using nBin of %s' % nBin)
+        #print('using nBin of %s' % nBin)
         bamCommand = "bamliquidator %s %s %s %s %s %s %s" % (bamFile,line[0],gffLocus.start(),gffLocus.end(),bamSense,nBin,extension)
-        print(bamCommand)
+        #print(bamCommand)
         getReads = subprocess.Popen(bamCommand,stdin = subprocess.PIPE,stderr = subprocess.PIPE,stdout = subprocess.PIPE,shell = True)
         readString = getReads.communicate()
         denList = readString[0].split('\n')[:-1]
