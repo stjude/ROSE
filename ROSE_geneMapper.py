@@ -226,11 +226,11 @@ def main():
     #GETTING THE CORRECT ANNOT FILE
     cwd = os.getcwd()
     genomeDict = {
-        'HG18':'%s/annotation/hg18/hg18_refseq.ucsc' % (cwd),
-        'MM9': '%s/annotation/mm9/mm9_refseq.ucsc' % (cwd),
-        'HG19':'%s/annotation/hg19/hg19_refseq.ucsc' % (cwd),
-        'MM8': '%s/annotation/mm8/mm8_refseq.ucsc' % (cwd),
-        'MM10':'%s/annotation/mm10/mm10_refseq.ucsc' % (cwd),
+        'HG18':'%s/annotation/hg18_refseq.ucsc' % (cwd),
+        'MM9': '%s/annotation/mm9_refseq.ucsc' % (cwd),
+        'HG19':'%s/annotation/hg19_refseq.ucsc' % (cwd),
+        'MM8': '%s/annotation/mm8_refseq.ucsc' % (cwd),
+        'MM10':'%s/annotation/mm10_refseq.ucsc' % (cwd),
         }
 
     annotFile = genomeDict[upper(genome)]
@@ -253,7 +253,7 @@ def main():
 
     #writing the gene table
     out2 = '%s%s_GENE_TO_ENHANCER.txt' % (outFolder,enhancerFileName)
-    ROSE_utils.unParseTable(enhancerToGeneTable,out2,'\t')
+    ROSE_utils.unParseTable(geneToEnhancerTable,out2,'\t')
 
 if __name__ == "__main__":
     main()
