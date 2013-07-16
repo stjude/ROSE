@@ -407,15 +407,15 @@ def main():
     while not outputDone:
 
         '''
-        check every 5 minutes for completed output
+        check every 1 minutes for completed output
         '''
         outputDone = True
         if ticker%6 == 0:
             print(ticker*5)
         ticker +=1
         #CHANGE THIS PARAMETER TO ALLOW MORE TIME TO MAP
-        if ticker == 144:
-            print('ERROR: OPERATION TIME OUT. MAPPING OUTPUT NOT DETECTED')
+        if ticker == 120:
+            print('ERROR: OPERATION TIME OUT. MAPPING OUTPUT NOT DETECTED AFTER 2 HOURS')
             exit()
             break
         for bamFile in bamFileList:
@@ -439,8 +439,8 @@ def main():
                 outputDone = False
         if outputDone == True:
             break
-        time.sleep(300)
-    print('MAPPING TOOK %s MINUTES' % (ticker*5))
+        time.sleep(60)
+    print('MAPPING TOOK %s MINUTES' % (ticker))
 
     print('BAM MAPPING COMPLETED NOW MAPPING DATA TO REGIONS')
     #CALCULATE DENSITY BY REGION
@@ -464,6 +464,14 @@ def main():
         cmd = 'R --no-save %s %s %s %s < ROSE_callSuper.R' % (outFolder,outputFile1,inputName,controlName)
     print(cmd)
     os.system(cmd)
+
+
+    #calling the gene mapper                                                                        
+    time.sleep(60)
+    superTableFile = "%s_SuperEnhancers.table.txt" % (inputName)
+    cmd = "python ROSE_geneMapper.py -g %s -i %s" % (genome,superTableFile)
+    os.system(cmd)    
+
 
 
 
