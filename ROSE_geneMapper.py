@@ -168,8 +168,14 @@ def mapEnhancerToGene(annotFile,enhancerFile,transcribedFile='',uniqueGenes=True
         newLine = [geneName,refID,join(proxEnhancers,',')]
         geneToEnhancerTable.append(newLine)
 
+    #resort enhancerToGeneTable
 
-    return enhancerToGeneTable,geneToEnhancerTable
+    enhancerOrder = ROSE_utils.order([int(line[-2]) for line in enhancerToGeneTable[1:]])
+    sortedTable = [enhancerToGeneTable[0]]
+    for i in enhancerOrder:
+        sortedTable.append(enhancerToGeneTable[(i+1)])
+
+    return sortedTable,geneToEnhancerTable
 
 
 
