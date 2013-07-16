@@ -467,7 +467,7 @@ def main():
 
 
     #calling the gene mapper                                                                        
-    time.sleep(60)
+    time.sleep(20)
     superTableFile = "%s_SuperEnhancers.table.txt" % (inputName)
     cmd = "python ROSE_geneMapper.py -g %s -i %s%s" % (genome,outFolder,superTableFile)
     os.system(cmd)    
