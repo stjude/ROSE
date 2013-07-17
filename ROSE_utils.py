@@ -58,6 +58,37 @@ def parseTable(fn, sep, header = False,excel = False):
     return table
 
 
+def formatBed(bed,output=''):
+
+    '''
+    formats a bed file from UCSC or MACS into a WUSTL gateway compatible bed
+    '''
+
+
+    newBed = []
+
+    if type(bed) == str:
+        bed = parseTable(bed,'\t')
+
+    indexTicker = 1
+    for line in bed:
+
+        newLine = line[0:4]
+        try:
+            strand = line[5]
+        except IndexError:
+            strand = '.'
+        newLine+= [indexTicker,strand]
+        indexTicker +=1
+        newBed.append(newLine)
+    
+    if len(output) > 0:
+        unParseTable(newBed,output,'\t')
+    else:
+        return newBed
+    
+    
+
 def bedToGFF(bed,output=''):
 
     '''
@@ -65,10 +96,12 @@ def bedToGFF(bed,output=''):
     '''
     if type(bed) == str:
         bed = parseTable(bed,'\t')
+    
+    bed = formatBed(bed)
 
     gff = []
     for line in bed:
-        gffLine = [line[0],line[3],'',line[1],line[2],line[4],'.','',line[3]]
+        gffLine = [line[0],line[3],'',line[1],line[2],line[4],line[5],'',line[3]]
         gff.append(gffLine)
 
     if len(output) > 0:
@@ -85,8 +118,10 @@ def gffToBed(gff,output= ''):
     turns a gff to a bed file
     '''
     bed = []
+    indexTicker = 1
     for line in gff:
-        newLine = [line[0],line[3],line[4],line[1],0,line[6]]
+        newLine = [line[0],line[3],line[4],line[1],indexTicker,line[6]]
+        indexTicker+=1
         bed.append(newLine)
     if len(output) == 0:
         return bed

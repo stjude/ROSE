@@ -54,6 +54,37 @@ convert_stitched_to_bed <- function(inputStitched,trackName,trackDescription,out
 	}
 }
 
+
+
+convert_stitched_to_gateway_bed <- function(inputStitched,outputFileRoot,splitSuper=TRUE,score=c(),superRows=c()){
+	outMatrix <- matrix(data="",ncol=6,nrow=nrow(inputStitched))
+	
+	outMatrix[,1] <- as.character(inputStitched$CHROM)
+	outMatrix[,2] <- as.character(inputStitched$START)
+	outMatrix[,3] <- as.character(inputStitched$STOP)
+	outMatrix[,4] <- as.character(inputStitched$REGION_ID)
+	
+	if(length(score)==nrow(inputStitched)){
+		score <- rank(score,ties.method="first")
+		score <- length(score)-score+1  #Stupid rank only does smallest to largest. 
+		outMatrix[,5] <- as.character(score)
+	}
+	
+	outMatrix[,6] <- as.character(rep('.',nrow(outMatrix)))
+	
+	
+	outputFile1 = paste(outputFileRoot,'_Gateway_Enhancers.bed',sep='')
+	write.table(file= outputFile1,outMatrix,sep="\t",quote=FALSE,row.names=FALSE,col.names=FALSE,append=TRUE)
+	if(splitSuper==TRUE){
+		outputFile2 = paste(outputFileRoot,'_Gateway_SuperEnhancers.bed',sep='')
+
+		write.table(file= outputFile2,outMatrix[superRows,],sep="\t",quote=FALSE,row.names=FALSE,col.names=FALSE,append=TRUE)
+	}
+}
+
+
+
+
 writeSuperEnhancer_table <- function(superEnhancer,description,outputFile,additionalData=NA){
 	description <- paste("#",description,"\nCreated on ",format(Sys.time(), "%b %d %Y"),collapse="",sep="")
 	description <- gsub("\n","\n#",description)
@@ -140,8 +171,8 @@ if(wceName == 'NONE'){
 }else{
 	plot(length(rankBy_vector):1,rankBy_vector[signalOrder], col='red',xlab=paste(rankBy_factor,'_enhancers'),ylab=paste(rankBy_factor,' Signal','- ',wceName),pch=19,cex=2)
 }
-abline(h=cutoff_options$absolute,color='grey',lty=2)
-abline(v=length(rankBy_vector)-length(superEnhancerRows),color='grey',lty=2)
+abline(h=cutoff_options$absolute,col='grey',lty=2)
+abline(v=length(rankBy_vector)-length(superEnhancerRows),col='grey',lty=2)
 lines(length(rankBy_vector):1,rankBy_vector[signalOrder],lwd=4, col='red')
 text(0,0.8*max(rankBy_vector),paste(' Cutoff used: ',cutoff_options$absolute,'\n','Super-Enhancers identified: ',length(superEnhancerRows)),pos=4)
 
@@ -154,6 +185,10 @@ dev.off()
 bedFileName = paste(outFolder,enhancerName,'_Enhancers_withSuper.bed',sep='')
 convert_stitched_to_bed(stitched_regions,paste(rankBy_factor,"Enhancers"), enhancerDescription,bedFileName,score=rankBy_vector,splitSuper=TRUE,superRows= superEnhancerRows,baseColor="0,0,0",superColor="255,0,0")
 
+
+bedFileRoot = paste(outFolder,enhancerName,sep='')
+
+convert_stitched_to_gateway_bed(stitched_regions,bedFileRoot,splitSuper=TRUE,score=rankBy_vector,superRows = superEnhancerRows)
 
 
 #This matrix is just the super_enhancers
