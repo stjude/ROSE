@@ -233,7 +233,7 @@ def main():
                       help = "Enter a comma separated list of additional bam files to map to")
     parser.add_option("-c","--control", dest="control",nargs = 1, default=None,
                       help = "bamfile to rank enhancer by")
-    parser.add_option("-s","--stitch", dest="stitch",nargs = 1, default=5000,
+    parser.add_option("-s","--stitch", dest="stitch",nargs = 1, default=12500,
                       help = "Enter a max linking distance for stitching")
     parser.add_option("-t","--tss", dest="tss",nargs = 1, default=0,
                       help = "Enter a distance from TSS to exclude. 0 = no TSS exclusion")
