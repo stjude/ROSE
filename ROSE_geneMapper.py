@@ -27,7 +27,7 @@ from collections import defaultdict
 
 
 
-def mapEnhancerToGene(annotFile,enhancerFile,transcribedFile='',uniqueGenes=True):
+def mapEnhancerToGene(annotFile,enhancerFile,transcribedFile='',uniqueGenes=True,searchWindow =50000):
     
     '''
     maps genes to enhancers. if uniqueGenes, reduces to gene name only. Otherwise, gives for each refseq
@@ -67,13 +67,15 @@ def mapEnhancerToGene(annotFile,enhancerFile,transcribedFile='',uniqueGenes=True
 
     #set up the output tables
     #first by enhancer
-    enhancerToGeneTable = [enhancerTable[5][0:6]+['OVERLAP_GENES','PROXIMAL_GENES','CLOSEST_GENE'] + enhancerTable[5][-2:]]
+    enhancerToGeneTable = [enhancerTable[0][0:9]+['OVERLAP_GENES','PROXIMAL_GENES','CLOSEST_GENE'] + enhancerTable[5][-2:]]
     
     #next by gene
     geneToEnhancerTable = [['GENE_NAME','REFSEQ_ID','PROXIMAL_ENHANCERS']]
 
 
-    for line in enhancerTable[6:]:
+    for line in enhancerTable:
+        if line[0][0] =='#' or line[0][0] == 'R':
+            continue
 
         enhancerString = '%s:%s-%s' % (line[1],line[2],line[3])
         
@@ -86,7 +88,7 @@ def mapEnhancerToGene(annotFile,enhancerFile,transcribedFile='',uniqueGenes=True
             overlappingGenes.append(overlapLocus.ID())
 
         #proximalGenes are transcribed genes where the tss is within 50kb of the boundary of the stitched loci
-        proximalLoci = tssCollection.getOverlap(ROSE_utils.makeSearchLocus(enhancerLocus,50000,50000),'both')           
+        proximalLoci = tssCollection.getOverlap(ROSE_utils.makeSearchLocus(enhancerLocus,searchWindow,searchWindow),'both')           
         proximalGenes =[]
         for proxLocus in proximalLoci:
             proximalGenes.append(proxLocus.ID())
@@ -128,7 +130,7 @@ def mapEnhancerToGene(annotFile,enhancerFile,transcribedFile='',uniqueGenes=True
             closestGene = startDict[allEnhancerGenes[distList.index(min(distList))]]['name']
 
         #NOW WRITE THE ROW FOR THE ENHANCER TABLE
-        newEnhancerLine = line[0:6]
+        newEnhancerLine = line[0:9]
         newEnhancerLine.append(join(ROSE_utils.uniquify([startDict[x]['name'] for x in overlappingGenes]),','))
         newEnhancerLine.append(join(ROSE_utils.uniquify([startDict[x]['name'] for x in proximalGenes]),','))
         newEnhancerLine.append(closestGene)
@@ -204,6 +206,8 @@ def main():
                       help = "Enter a gene list to filter through")
     parser.add_option("-o","--out", dest="out",nargs = 1, default=None,
                       help = "Enter an output folder. Default will be same folder as input file")
+    parser.add_option("-w","--window", dest="window",nargs = 1, default=50000,
+                      help = "Enter a search distance for genes. Default is 50,000bp")
 
     #RETRIEVING FLAGS
     (options,args) = parser.parse_args()
@@ -216,6 +220,7 @@ def main():
 
     #GETTING THE INPUT
     enhancerFile = options.input
+    window = int(options.window)
 
     #making the out folder if it doesn't exist
     if options.out:
@@ -248,18 +253,27 @@ def main():
     else:
         transcribedFile = ''
 
-    enhancerToGeneTable,geneToEnhancerTable = mapEnhancerToGene(annotFile,enhancerFile,uniqueGenes=True)
+    enhancerToGeneTable,geneToEnhancerTable = mapEnhancerToGene(annotFile,enhancerFile,uniqueGenes=True,searchWindow = window)
 
     #Writing enhancer output
     enhancerFileName = enhancerFile.split('/')[-1].split('.')[0]
 
-    #writing the enhancer table
-    out1 = '%s%s_ENHANCER_TO_GENE.txt' % (outFolder,enhancerFileName)
-    ROSE_utils.unParseTable(enhancerToGeneTable,out1,'\t')
+    if window != 50000:
+        #writing the enhancer table
+        out1 = '%s%s_ENHANCER_TO_GENE_%sKB.txt' % (outFolder,enhancerFileName,window/1000)
+        ROSE_utils.unParseTable(enhancerToGeneTable,out1,'\t')
 
-    #writing the gene table
-    out2 = '%s%s_GENE_TO_ENHANCER.txt' % (outFolder,enhancerFileName)
-    ROSE_utils.unParseTable(geneToEnhancerTable,out2,'\t')
+        #writing the gene table
+        out2 = '%s%s_GENE_TO_ENHANCER_%sKB.txt' % (outFolder,enhancerFileName,window/1000)
+        ROSE_utils.unParseTable(geneToEnhancerTable,out2,'\t')
+    else:
+        #writing the enhancer table
+        out1 = '%s%s_ENHANCER_TO_GENE.txt' % (outFolder,enhancerFileName)
+        ROSE_utils.unParseTable(enhancerToGeneTable,out1,'\t')
+
+        #writing the gene table
+        out2 = '%s%s_GENE_TO_ENHANCER.txt' % (outFolder,enhancerFileName)
+        ROSE_utils.unParseTable(geneToEnhancerTable,out2,'\t')
 
 if __name__ == "__main__":
     main()
