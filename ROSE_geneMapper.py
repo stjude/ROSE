@@ -253,7 +253,7 @@ def main():
     else:
         transcribedFile = ''
 
-    enhancerToGeneTable,geneToEnhancerTable = mapEnhancerToGene(annotFile,enhancerFile,uniqueGenes=True,searchWindow = window)
+    enhancerToGeneTable,geneToEnhancerTable = mapEnhancerToGene(annotFile,enhancerFile,transcribedFile,uniqueGenes=True,searchWindow = window)
 
     #Writing enhancer output
     enhancerFileName = enhancerFile.split('/')[-1].split('.')[0]
