@@ -27,7 +27,7 @@ from collections import defaultdict
 
 
 
-def mapEnhancerToGene(annotFile,enhancerFile,transcribedFile='',uniqueGenes=True,searchWindow =50000):
+def mapEnhancerToGene(annotFile,enhancerFile,transcribedFile='',uniqueGenes=True,searchWindow =50000,noFormatTable = False):
     
     '''
     maps genes to enhancers. if uniqueGenes, reduces to gene name only. Otherwise, gives for each refseq
@@ -59,18 +59,35 @@ def mapEnhancerToGene(annotFile,enhancerFile,transcribedFile='',uniqueGenes=True
     #50 is the internal parameter for LocusCollection and doesn't really matter
     tssCollection = ROSE_utils.LocusCollection(tssLoci,50)
 
-
+    
 
     geneDict = {'overlapping':defaultdict(list),'proximal':defaultdict(list)}
+
+    #dictionaries to hold ranks and superstatus of gene nearby enhancers
+    rankDict = defaultdict(list)
+    superDict= defaultdict(list)
+
     #list of all genes that appear in this analysis
     overallGeneList = []
 
-    #set up the output tables
-    #first by enhancer
-    enhancerToGeneTable = [enhancerTable[0][0:9]+['OVERLAP_GENES','PROXIMAL_GENES','CLOSEST_GENE'] + enhancerTable[5][-2:]]
-    
-    #next by gene
-    geneToEnhancerTable = [['GENE_NAME','REFSEQ_ID','PROXIMAL_ENHANCERS']]
+    if noFormatTable:
+        #set up the output tables
+        #first by enhancer
+        enhancerToGeneTable = [enhancerTable[0]+['OVERLAP_GENES','PROXIMAL_GENES','CLOSEST_GENE']]
+
+        
+    else:
+        #set up the output tables
+        #first by enhancer
+        enhancerToGeneTable = [enhancerTable[0][0:9]+['OVERLAP_GENES','PROXIMAL_GENES','CLOSEST_GENE'] + enhancerTable[5][-2:]]
+
+        #next by gene
+        geneToEnhancerTable = [['GENE_NAME','REFSEQ_ID','PROXIMAL_ENHANCERS']]
+
+    #next make the gene to enhancer table
+    geneToEnhancerTable = [['GENE_NAME','REFSEQ_ID','PROXIMAL_ENHANCERS','ENHANCER_RANKS','IS_SUPER']]
+
+        
 
 
     for line in enhancerTable:
@@ -130,32 +147,47 @@ def mapEnhancerToGene(annotFile,enhancerFile,transcribedFile='',uniqueGenes=True
             closestGene = startDict[allEnhancerGenes[distList.index(min(distList))]]['name']
 
         #NOW WRITE THE ROW FOR THE ENHANCER TABLE
-        newEnhancerLine = line[0:9]
-        newEnhancerLine.append(join(ROSE_utils.uniquify([startDict[x]['name'] for x in overlappingGenes]),','))
-        newEnhancerLine.append(join(ROSE_utils.uniquify([startDict[x]['name'] for x in proximalGenes]),','))
-        newEnhancerLine.append(closestGene)
-        newEnhancerLine += line[-2:]
+        if noFormatTable:
+
+            newEnhancerLine = list(line)
+            newEnhancerLine.append(join(ROSE_utils.uniquify([startDict[x]['name'] for x in overlappingGenes]),','))
+            newEnhancerLine.append(join(ROSE_utils.uniquify([startDict[x]['name'] for x in proximalGenes]),','))
+            newEnhancerLine.append(closestGene)
+
+        else:
+            newEnhancerLine = line[0:9]
+            newEnhancerLine.append(join(ROSE_utils.uniquify([startDict[x]['name'] for x in overlappingGenes]),','))
+            newEnhancerLine.append(join(ROSE_utils.uniquify([startDict[x]['name'] for x in proximalGenes]),','))
+            newEnhancerLine.append(closestGene)
+            newEnhancerLine += line[-2:]
+
         enhancerToGeneTable.append(newEnhancerLine)
         #Now grab all overlapping and proximal genes for the gene ordered table
 
         overallGeneList +=overlappingGenes
         for refID in overlappingGenes:
             geneDict['overlapping'][refID].append(enhancerString)
-        
-
+            rankDict[refID].append(int(line[-2]))
+            superDict[refID].append(int(line[-1]))
+            
         overallGeneList+=proximalGenes
         for refID in proximalGenes:
             geneDict['proximal'][refID].append(enhancerString)
+            rankDict[refID].append(int(line[-2]))
+            superDict[refID].append(int(line[-1]))
+
+
 
     #End loop through
     
     #Make table by gene
     overallGeneList = ROSE_utils.uniquify(overallGeneList)  
 
-    nameOrder = ROSE_utils.order([startDict[x]['name'] for x in overallGeneList])
+    #use enhancer rank to order
+    rankOrder = ROSE_utils.order([min(rankDict[x]) for x in overallGeneList])
         
     usedNames = []
-    for i in nameOrder:
+    for i in rankOrder:
         refID = overallGeneList[i]
         geneName = startDict[refID]['name']
         if usedNames.count(geneName) > 0 and uniqueGenes == True:
@@ -164,20 +196,24 @@ def mapEnhancerToGene(annotFile,enhancerFile,transcribedFile='',uniqueGenes=True
         else:
             usedNames.append(geneName)
         
-        proxEnhancers = geneDict['proximal'][refID] + geneDict['overlapping'][refID]
+        proxEnhancers = geneDict['overlapping'][refID]+geneDict['proximal'][refID]
         
+        superStatus = max(superDict[refID])
+        enhancerRanks = join([str(x) for x in rankDict[refID]],',')
     
-        newLine = [geneName,refID,join(proxEnhancers,',')]
+        newLine = [geneName,refID,join(proxEnhancers,','),enhancerRanks,superStatus]
         geneToEnhancerTable.append(newLine)
 
     #resort enhancerToGeneTable
+    if noFormatTable:
+        return enhancerToGeneTable,geneToEnhancerTable
+    else:
+        enhancerOrder = ROSE_utils.order([int(line[-2]) for line in enhancerToGeneTable[1:]])
+        sortedTable = [enhancerToGeneTable[0]]
+        for i in enhancerOrder:
+            sortedTable.append(enhancerToGeneTable[(i+1)])
 
-    enhancerOrder = ROSE_utils.order([int(line[-2]) for line in enhancerToGeneTable[1:]])
-    sortedTable = [enhancerToGeneTable[0]]
-    for i in enhancerOrder:
-        sortedTable.append(enhancerToGeneTable[(i+1)])
-
-    return sortedTable,geneToEnhancerTable
+        return sortedTable,geneToEnhancerTable
 
 
 
@@ -208,6 +244,8 @@ def main():
                       help = "Enter an output folder. Default will be same folder as input file")
     parser.add_option("-w","--window", dest="window",nargs = 1, default=50000,
                       help = "Enter a search distance for genes. Default is 50,000bp")
+    parser.add_option("-f","--format", dest="formatTable",action= "store_true", default=False,
+                      help = "If flagged, maintains original formatting of input table")
 
     #RETRIEVING FLAGS
     (options,args) = parser.parse_args()
@@ -233,6 +271,11 @@ def main():
     genome = options.genome
     print('USING %s AS THE GENOME' % genome)
 
+    #CHECK FORMATTING FLAG
+    if options.formatTable:
+        noFormatTable =True
+    else:
+        noFormatTable = False
 
     #GETTING THE CORRECT ANNOT FILE
     cwd = os.getcwd()
@@ -253,7 +296,7 @@ def main():
     else:
         transcribedFile = ''
 
-    enhancerToGeneTable,geneToEnhancerTable = mapEnhancerToGene(annotFile,enhancerFile,transcribedFile,uniqueGenes=True,searchWindow = window)
+    enhancerToGeneTable,geneToEnhancerTable = mapEnhancerToGene(annotFile,enhancerFile,transcribedFile,True,window,noFormatTable)
 
     #Writing enhancer output
     enhancerFileName = enhancerFile.split('/')[-1].split('.')[0]
