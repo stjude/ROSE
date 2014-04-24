@@ -509,8 +509,8 @@ def gffToLocusCollection(gff,window =500):
 
     for line in gff:
         #USE line[2] as the locus ID.  If that is empty use line[8]
-        if len(line[2]) > 0:
-            name = line[2]
+        if len(line[1]) > 0:
+            name = line[1]
         elif len(line[8]) >0:
             name = line[8]
         else:
