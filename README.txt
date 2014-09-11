@@ -2,6 +2,9 @@
 
 ROSE IS RELEASED UNDER THE MIT X11 LICENSE
 
+EXAMPLE DATA AND ADDTIONAL INFORMATION CAN BE FOUND HERE:
+http://younglab.wi.mit.edu/super_enhancer_code.html
+
 N.B. LICENSE.txt
 
 For details of this analysis see:
