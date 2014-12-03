@@ -21,6 +21,27 @@ from string import upper,join
 
 from collections import defaultdict
 
+
+#==================================================================
+#=================CHECKING REFERENCE COLLECTION====================
+#==================================================================
+
+
+def checkRefCollection(referenceCollection):
+
+    '''
+    makes sure the names of all loci in the reference collection are unique
+    '''
+
+    namesList = [locus.ID() for locus in referenceCollection.getLoci()]
+    
+    if len(namesList) != len(ROSE_utils.uniquify(namesList)):
+        print("ERROR: REGIONS HAVE NON-UNIQUE IDENTIFIERS")
+        sys.exit()
+    else:
+        print("REFERENCE COLLECTION PASSES QC")
+        return
+
 #==================================================================
 #=====================REGION STITCHING=============================
 #==================================================================
@@ -330,6 +351,9 @@ def main():
     print('LOADING IN GFF REGIONS')
     referenceCollection = ROSE_utils.gffToLocusCollection(inputGFFFile)
 
+    #CHECKING INPUT REGIONS FOR FORMATTING
+    print('CHECKING INPUT TO MAKE SURE EACH REGION HAS A UNIQUE IDENTIFIER')
+    checkRefCollection(referenceCollection) #makes sure that all input regions have a unique ID
 
     #NOW STITCH REGIONS
     print('STITCHING REGIONS TOGETHER')
