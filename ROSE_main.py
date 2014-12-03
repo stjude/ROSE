@@ -37,6 +37,7 @@ def checkRefCollection(referenceCollection):
     
     if len(namesList) != len(ROSE_utils.uniquify(namesList)):
         print("ERROR: REGIONS HAVE NON-UNIQUE IDENTIFIERS")
+        print("THE SECOND COLUMN OF THE INPUT .GFF OR THE FOURTH COLUMN OF THE INPUT .BED MUST HAVE A UNIQUE IDENTIFIER FOR EACH REGION")
         sys.exit()
     else:
         print("REFERENCE COLLECTION PASSES QC")
