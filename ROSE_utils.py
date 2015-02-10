@@ -43,17 +43,15 @@ def unParseTable(table, output, sep):
 #table = parseTable('file.txt','\t')
 def parseTable(fn, sep, header = False,excel = False):
     fh = open(fn)
-    lines = fh.readlines()
-    fh.close()
-    if excel:
-        lines = lines[0].split('\r')
-    if lines[0].count('\r') > 0:
-        lines = lines[0].split('\r')
-    table = []
     if header == True:
-        lines =lines[1:]
-    for i in lines:
-        table.append(i[:-1].split(sep))
+        header = fh.readline() #disposes of the header
+
+    table = []
+    for line in fh:
+        line = line.rstrip().split(sep)
+        table.append(line)
+
+    fh.close()
 
     return table
 
@@ -509,6 +507,15 @@ def gffToLocusCollection(gff,window =500):
 
     for line in gff:
         #USE line[2] as the locus ID.  If that is empty use line[8]
+        if len(line) < 7:
+            print('SKIPPING THIS LINE')
+            print(line)
+            continue
+
+
+        if line[0][0] == '#':
+            continue
+
         if len(line[1]) > 0:
             name = line[1]
         elif len(line[8]) >0:
