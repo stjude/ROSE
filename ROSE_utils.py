@@ -505,6 +505,8 @@ def gffToLocusCollection(gff,window =500):
     if type(gff) == str:
         gff = parseTable(gff,'\t')
 
+
+    nameList = []
     for line in gff:
         #USE line[2] as the locus ID.  If that is empty use line[8]
         if len(line) < 7:
@@ -522,8 +524,13 @@ def gffToLocusCollection(gff,window =500):
             name = line[8]
         else:
             name = '%s:%s:%s-%s' % (line[0],line[6],line[3],line[4])
-
+        nameList.append(name)
         lociList.append(Locus(line[0],line[3],line[4],line[6],name))
+
+    #check that all the names are unique
+    if len(nameList) != len(uniquify(nameList)):
+        print('ERROR: FOR GFFS, ALL REGIONS MUST HAVE A UNIQUE IDENTIFIER IN COLUMN 2')
+        sys.exit()
     return LocusCollection(lociList,window)
 
 
