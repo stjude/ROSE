@@ -51,7 +51,7 @@ ROSE_utils.py: utility methods
 ROSE_bamToGFF.py: calculates density of .bam sequencing reads in .gff regions
 ROSE_callSuper.R: ranks regions by their densities, creates a cutoff to separate super-enhancers from typical enhancers
 ROSE_geneMapper.py: assigns stitched enhancers to genes
-annotation/: Refseq gene tables for genomes MM8,MM9,MM10,HG18,HG19
+annotation/: Refseq gene tables for genomes MM8,MM9,MM10,HG18,HG19,HG38
 In ROSE_DATA
 
 example.sh: sample call of ROSE_main.py
@@ -66,7 +66,7 @@ python ROSE_main.py -g GENOME_BUILD -i INPUT_CONSTITUENT_GFF -r RANKING_BAM -o O
 
 Required parameters:
 
-GENOME_BUILD: one of hg18, hg19, mm8, mm9, or mm10 referring to the UCSC genome build used for read mapping
+GENOME_BUILD: one of hg18, hg19, hg38, mm8, mm9, or mm10 referring to the UCSC genome build used for read mapping
 INPUT_CONSTITUENT_GFF: .gff file (described above) of regions that were previously calculated to be enhancers. I.e. Med1-enriched regions identified using MACS.
 RANKING_BAM: .bam file to be used for ranking enhancers by density of this factor. I.e. Med1 ChIP-Seq reads.
 OUTPUT_DIRECTORY: directory to be used for storing output.
