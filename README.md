@@ -33,13 +33,14 @@ MODIFIED BY :
     
         └── ROSE_main.py    : main program
 
-    2 directories, 8 files
+    Total: 2 directories, 8 files
 
 2) DEPENDENCIES
 
-* samtools
-* R version > 3.4
-* python2
+	* samtools
+	* R version > 3.4
+	* python2
+
 
 
 3) USAGE
