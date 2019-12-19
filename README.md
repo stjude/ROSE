@@ -2,14 +2,10 @@
 
 LICENSE: Information in LICENSE.txt. 
 
-MODIFIED BY :
-
-		Modupeore Adetunji
-		Abraham's Lab. Computational Biology Department.
-		St. Jude Children's Research Hospital.
+CLONED using SOURCETREE from: https://bitbucket.org/young_computation/rose/src/master/
 
 
-#### === Changelog 
+#### === Changelog
 1) DIRECTORY structure
 
     ├── LICENSE.txt
@@ -40,8 +36,6 @@ MODIFIED BY :
 	* samtools
 	* R version > 3.4
 	* python2
-
-
 
 3) USAGE
 
