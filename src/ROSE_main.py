@@ -1,4 +1,5 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
+#changed to python3 #01/06/20
 
 #mapEnhancerFromFactor.py
 '''
@@ -46,7 +47,7 @@ def regionStitching(inputGFF,stitchWindow,tssWindow,annotFile,removeTSS=True):
         #this loop makes a locus centered around +/- tssWindow of transcribed genes
         #then adds it to the list tssLoci
         tssLoci = []
-        for geneID in startDict.keys():
+        for geneID in list(startDict.keys()):
             tssLoci.append(ROSE_utils.makeTSSLocus(geneID,startDict,tssWindow,tssWindow))
 
 
@@ -67,7 +68,7 @@ def regionStitching(inputGFF,stitchWindow,tssWindow,annotFile,removeTSS=True):
                 boundCollection.remove(locus)
                 debugOutput.append([locus.__str__(),locus.ID(),'CONTAINED'])
                 removeTicker+=1
-        print('REMOVED %s LOCI BECAUSE THEY WERE CONTAINED BY A TSS' % (removeTicker))
+        print(('REMOVED %s LOCI BECAUSE THEY WERE CONTAINED BY A TSS' % (removeTicker)))
 
     #boundCollection is now all enriched region loci that don't overlap an active TSS
     stitchedCollection = boundCollection.stitchCollection(stitchWindow,'both')
@@ -77,7 +78,7 @@ def regionStitching(inputGFF,stitchWindow,tssWindow,annotFile,removeTSS=True):
         #with the original loci that were there
         fixedLoci = []
         tssLoci = []
-        for geneID in startDict.keys():
+        for geneID in list(startDict.keys()):
             tssLoci.append(ROSE_utils.makeTSSLocus(geneID,startDict,50,50))
 
 
@@ -101,8 +102,8 @@ def regionStitching(inputGFF,stitchWindow,tssWindow,annotFile,removeTSS=True):
             else:
                 fixedLoci.append(stitchedLocus)
 
-        print('REMOVED %s STITCHED LOCI BECAUSE THEY OVERLAPPED MULTIPLE TSSs' % (removeTicker))
-        print('ADDED BACK %s ORIGINAL LOCI' % (originalTicker))
+        print(('REMOVED %s STITCHED LOCI BECAUSE THEY OVERLAPPED MULTIPLE TSSs' % (removeTicker)))
+        print(('ADDED BACK %s ORIGINAL LOCI' % (originalTicker)))
         fixedCollection = ROSE_utils.LocusCollection(fixedLoci,50)
         return fixedCollection,debugOutput
     else:
@@ -163,16 +164,16 @@ def mapCollection(stitchedCollection,referenceCollection,bamFileList,mappedFolde
         
         bamFileName = bamFile.split('/')[-1]
 
-        print('GETTING MAPPING DATA FOR  %s' % bamFile)
+        print(('GETTING MAPPING DATA FOR  %s' % bamFile))
         #assumes standard convention for naming enriched region gffs
         
         #opening up the mapped GFF
-        print('OPENING %s%s_%s_MAPPED.gff' % (mappedFolder,refName,bamFileName))
+        print(('OPENING %s%s_%s_MAPPED.gff' % (mappedFolder,refName,bamFileName)))
 
         mappedGFF =ROSE_utils.parseTable('%s%s_%s_MAPPED.gff' % (mappedFolder,refName,bamFileName),'\t')        
 
         signalDict = defaultdict(float)
-        print('MAKING SIGNAL DICT FOR %s' % (bamFile))
+        print(('MAKING SIGNAL DICT FOR %s' % (bamFile)))
         mappedLoci = []
         for line in mappedGFF[1:]:
 
@@ -301,13 +302,13 @@ def main():
         removeTSS = False
 
     #GETTING THE BOUND REGION FILE USED TO DEFINE ENHANCERS
-    print('USING %s AS THE INPUT GFF' % (inputGFFFile))
+    print(('USING %s AS THE INPUT GFF' % (inputGFFFile)))
     inputName = inputGFFFile.split('/')[-1].split('.')[0]
 
 
     #GETTING THE GENOME
     genome = options.genome
-    print('USING %s AS THE GENOME' % genome)
+    print(('USING %s AS THE GENOME' % genome))
 
 
     #GETTING THE CORRECT ANNOT FILE
@@ -354,11 +355,11 @@ def main():
     #WRITING DEBUG OUTPUT TO DISK
         
     if debug:
-        print('WRITING DEBUG OUTPUT TO DISK AS %s' % (debugOutFile))
+        print(('WRITING DEBUG OUTPUT TO DISK AS %s' % (debugOutFile)))
         ROSE_utils.unParseTable(debugOutput,debugOutFile,'\t')
 
     #WRITE THE GFF TO DISK
-    print('WRITING STITCHED GFF TO DISK AS %s' % (stitchedGFFFile))
+    print(('WRITING STITCHED GFF TO DISK AS %s' % (stitchedGFFFile)))
     ROSE_utils.unParseTable(stitchedGFF,stitchedGFFFile,'\t')
 
 
@@ -366,7 +367,7 @@ def main():
     #SETTING UP THE OVERALL OUTPUT FILE
     outputFile1 = outFolder + stitchedGFFName + '_ENHANCER_REGION_MAP.txt'
 
-    print('OUTPUT WILL BE WRITTEN TO  %s' % (outputFile1))
+    print(('OUTPUT WILL BE WRITTEN TO  %s' % (outputFile1)))
     
     #MAPPING TO THE NON STITCHED (ORIGINAL GFF)
     #MAPPING TO THE STITCHED GFF
@@ -413,7 +414,7 @@ def main():
         '''
         outputDone = True
         if ticker%6 == 0:
-            print(ticker*5)
+            print((ticker*5))
         ticker +=1
         #CHANGE THIS PARAMETER TO ALLOW MORE TIME TO MAP
         if ticker == 144:
@@ -442,7 +443,7 @@ def main():
         if outputDone == True:
             break
         time.sleep(300)
-    print('MAPPING TOOK %s MINUTES' % (ticker*5))
+    print(('MAPPING TOOK %s MINUTES' % (ticker*5)))
 
     print('BAM MAPPING COMPLETED NOW MAPPING DATA TO REGIONS')
     #CALCULATE DENSITY BY REGION

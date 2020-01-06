@@ -1,5 +1,5 @@
-#!/usr/bin/env python2
-#130428
+#!/usr/bin/env python3
+#changed to python3 #01/06/20
 
 #ROSE_geneMapper.py
 
@@ -33,9 +33,9 @@ def mapEnhancerToGene(annotFile,enhancerFile,transcribedFile='',uniqueGenes=True
     '''
     maps genes to enhancers. if uniqueGenes, reduces to gene name only. Otherwise, gives for each refseq
     '''
-    print "Herp"
+    print("Herp")
     startDict = ROSE_utils.makeStartDict(annotFile)
-    print "Derp"
+    print("Derp")
     enhancerTable = ROSE_utils.parseTable(enhancerFile,'\t')
 
 
@@ -46,7 +46,7 @@ def mapEnhancerToGene(annotFile,enhancerFile,transcribedFile='',uniqueGenes=True
         transcribedTable = ROSE_utils.parseTable(transcribedFile,'\t')
         transcribedGenes = [line[1] for line in transcribedTable]
     else:
-        transcribedGenes = startDict.keys()
+        transcribedGenes = list(startDict.keys())
 
     print('MAKING TRANSCRIPT COLLECTION')
     transcribedCollection = ROSE_utils.makeTranscriptCollection(annotFile,0,0,500,transcribedGenes)
@@ -250,7 +250,7 @@ def main():
 
     #GETTING THE GENOME
     genome = options.genome
-    print('USING %s AS THE GENOME' % genome)
+    print(('USING %s AS THE GENOME' % genome))
 
 
     #GETTING THE CORRECT ANNOT FILE
