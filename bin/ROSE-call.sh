@@ -3,14 +3,7 @@
 # Rose Caller to detect both Enhancers and Super-Enhancers
 #
 # Version 1 11/16/2019
-
-##############################################################
-# ##### Please replace PATHTO with your own directory ###### #
-##############################################################
-PATHTO=/path/to/ROSE
-PYTHONPATH=$PATHTO/lib
-export PYTHONPATH
-export PATH=$PATH:$PATHTO/src
+# Updated: 1/9/2020
 
 if [ $# -lt 7 ]; then
   echo ""
