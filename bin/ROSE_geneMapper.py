@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #130428
 
 #ROSE_geneMapper.py
@@ -10,14 +10,11 @@
 
 import sys
 
-
-
 import ROSE_utils
-
 
 import os
 
-from string import upper,join
+import string
 
 from collections import defaultdict
 
@@ -33,9 +30,9 @@ def mapEnhancerToGene(annotFile,enhancerFile,transcribedFile='',uniqueGenes=True
     '''
     maps genes to enhancers. if uniqueGenes, reduces to gene name only. Otherwise, gives for each refseq
     '''
-    print "Herp"
+    print("Herp")
     startDict = ROSE_utils.makeStartDict(annotFile)
-    print "Derp"
+    print("Derp")
     enhancerTable = ROSE_utils.parseTable(enhancerFile,'\t')
 
 
@@ -46,7 +43,7 @@ def mapEnhancerToGene(annotFile,enhancerFile,transcribedFile='',uniqueGenes=True
         transcribedTable = ROSE_utils.parseTable(transcribedFile,'\t')
         transcribedGenes = [line[1] for line in transcribedTable]
     else:
-        transcribedGenes = startDict.keys()
+        transcribedGenes = list(startDict.keys())
 
     print('MAKING TRANSCRIPT COLLECTION')
     transcribedCollection = ROSE_utils.makeTranscriptCollection(annotFile,0,0,500,transcribedGenes)
@@ -132,24 +129,24 @@ def mapEnhancerToGene(annotFile,enhancerFile,transcribedFile='',uniqueGenes=True
             #print distList.index(min(distList))
             #print min(distList)
             #print len(distList)
-	    #print len(allEnhancerGenes[distList.index(min(distList))])
-	    #print line
-	    #print len(startDict[allEnhancerGenes[distList.index(min(distList))]])
+	        #print len(allEnhancerGenes[distList.index(min(distList))])
+	        #print line
+	        #print len(startDict[allEnhancerGenes[distList.index(min(distList))]])
             closestGene = startDict[allEnhancerGenes[distList.index(min(distList))]]['name']
 
         #NOW WRITE THE ROW FOR THE ENHANCER TABLE
         newEnhancerLine = line[0:6]
         if byRefseq:
-            newEnhancerLine.append(join(ROSE_utils.uniquify([x for x in overlappingGenes]),','))
-            newEnhancerLine.append(join(ROSE_utils.uniquify([x for x in proximalGenes]),','))
+            newEnhancerLine.append(','.join(ROSE_utils.uniquify([x for x in overlappingGenes])))
+            newEnhancerLine.append(','.join(ROSE_utils.uniquify([x for x in proximalGenes])))
             #print newEnhancerLine
             #print len(allEnhancerGenes)
             #print distList
             closestGene = allEnhancerGenes[distList.index(min(distList))]
             newEnhancerLine.append(closestGene)
         else:
-            newEnhancerLine.append(join(ROSE_utils.uniquify([startDict[x]['name'] for x in overlappingGenes]),','))
-            newEnhancerLine.append(join(ROSE_utils.uniquify([startDict[x]['name'] for x in proximalGenes]),','))
+            newEnhancerLine.append(','.join(ROSE_utils.uniquify([startDict[x]['name'] for x in overlappingGenes])))
+            newEnhancerLine.append(','.join(ROSE_utils.uniquify([startDict[x]['name'] for x in proximalGenes])))
             closestGene = startDict[allEnhancerGenes[distList.index(min(distList))]]['name']
             newEnhancerLine.append(closestGene)
 
@@ -187,7 +184,7 @@ def mapEnhancerToGene(annotFile,enhancerFile,transcribedFile='',uniqueGenes=True
         proxEnhancers = geneDict['proximal'][refID] + geneDict['overlapping'][refID]
         
     
-        newLine = [geneName,refID,join(proxEnhancers,',')]
+        newLine = [geneName,refID,','.join(proxEnhancers)]
         geneToEnhancerTable.append(newLine)
 
     #re-sort enhancerToGeneTable
@@ -245,12 +242,12 @@ def main():
     if options.out:
         outFolder = ROSE_utils.formatFolder(options.out,True)
     else:
-        outFolder = join(enhancerFile.split('/')[0:-1],'/') + '/'
+        outFolder = '/'.join(enhancerFile.split('/')[0:-1]) + '/'
 
 
     #GETTING THE GENOME
     genome = options.genome
-    print('USING %s AS THE GENOME' % genome)
+    print(('USING %s AS THE GENOME' % genome))
 
 
     #GETTING THE CORRECT ANNOT FILE
@@ -263,7 +260,7 @@ def main():
         'MM10':'%s/annotation/mm10_refseq.ucsc' % (cwd),
         }
 
-    annotFile = genomeDict[upper(genome)]
+    annotFile = genomeDict[genome.upper()]
 
     #GETTING THE TRANSCRIBED LIST
     if options.geneList:

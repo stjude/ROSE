@@ -29,7 +29,7 @@ def unParseTable(table, output, sep):
     else:
         for line in table:
             line = [str(x) for x in line]
-            line = join(line,sep)
+            line = sep.join(line)
 
             fh_out.write(line)
             fh_out.write('\n')
@@ -107,7 +107,7 @@ def formatFolder(folderName,create=False):
         foo = os.listdir(folderName)
         return folderName
     except OSError:
-        print('folder %s does not exist' % (folderName))
+        print(('folder %s does not exist' % (folderName)))
         if create:
             os.system('mkdir %s' % (folderName))
             return folderName
@@ -132,13 +132,13 @@ def makeStartDict(annotFile,geneList = []):
         geneList = parseTable(geneList,'\t')
         geneList = [line[0] for line in geneList]
             
-    if upper(annotFile).count('REFSEQ') == 1:
+    if annotFile.upper().count('REFSEQ') == 1:
         refseqTable,refseqDict = importRefseq(annotFile)
         if len(geneList) == 0:
-            geneList = refseqDict.keys()
+            geneList = list(refseqDict.keys())
         startDict = {}
         for gene in geneList:
-            if refseqDict.has_key(gene) == False:
+            if (gene in refseqDict) == False:
                 continue
             startDict[gene]={}
             startDict[gene]['sense'] = refseqTable[refseqDict[gene][0]][3]
@@ -165,7 +165,7 @@ def getTSSs(geneList,refseqTable,refseqDict):
             TSS.append(line[4])
         if line[3] == '-':
             TSS.append(line[5])
-    TSS = map(int,TSS)
+    TSS = list(map(int,TSS))
     
     return TSS
 
@@ -176,7 +176,7 @@ def getTSSs(geneList,refseqTable,refseqDict):
 def refseqFromKey(refseqKeyList,refseqDict,refseqTable):
     typeRefseq = []
     for name in refseqKeyList:
-        if refseqDict.has_key(name):
+        if name in refseqDict:
             typeRefseq.append(refseqTable[refseqDict[name][0]])
     return typeRefseq
 
@@ -195,7 +195,7 @@ def importRefseq(refseqFile, returnMultiples = False):
     refseqDict = {}
     ticker = 1
     for line in refseqTable[1:]:
-        if refseqDict.has_key(line[1]):
+        if line[1] in refseqDict:
             refseqDict[line[1]].append(ticker)
         else:
             refseqDict[line[1]] = [ticker]
@@ -226,14 +226,14 @@ class Locus:
     __senseDict = {'+':'+', '-':'-', '.':'.'}
     # chr = chromosome name (string)
     # sense = '+' or '-' (or '.' for an ambidexterous locus)
-    # start,end = ints of the start and end coords of the locus;
+    # start,end = ints of the start and end coords of the locus
     #      end coord is the coord of the last nucleotide.
     def __init__(self,chr,start,end,sense,ID=''):
         coords = [int(start),int(end)]
         coords.sort()
         # this method for assigning chromosome should help avoid storage of
         # redundant strings.
-        if not(self.__chrDict.has_key(chr)): self.__chrDict[chr] = chr
+        if not(chr in self.__chrDict): self.__chrDict[chr] = chr
         self._chr = self.__chrDict[chr]
         self._sense = self.__senseDict[sense]
         self._start = int(coords[0])
@@ -299,20 +299,20 @@ class LocusCollection:
         for lcs in loci: self.__addLocus(lcs)
 
     def __addLocus(self,lcs):
-        if not(self.__loci.has_key(lcs)):
+        if not(lcs in self.__loci):
             self.__loci[lcs] = None
             if lcs.sense()=='.': chrKeyList = [lcs.chr()+'+', lcs.chr()+'-']
             else: chrKeyList = [lcs.chr()+lcs.sense()]
             for chrKey in chrKeyList:
-                if not(self.__chrToCoordToLoci.has_key(chrKey)): self.__chrToCoordToLoci[chrKey] = dict()
+                if not(chrKey in self.__chrToCoordToLoci): self.__chrToCoordToLoci[chrKey] = dict()
                 for n in self.__getKeyRange(lcs):
-                    if not(self.__chrToCoordToLoci[chrKey].has_key(n)): self.__chrToCoordToLoci[chrKey][n] = []
+                    if not(n in self.__chrToCoordToLoci[chrKey]): self.__chrToCoordToLoci[chrKey][n] = []
                     self.__chrToCoordToLoci[chrKey][n].append(lcs)
 
     def __getKeyRange(self,locus):
-        start = locus.start() / self.__winSize
-        end = locus.end() / self.__winSize + 1 ## add 1 because of the range
-        return range(start,end)
+        start = locus.start() // self.__winSize
+        end = locus.end() // self.__winSize + 1 ## add 1 because of the range
+        return range(start, end)
 
     def __len__(self): return len(self.__loci)
         
@@ -320,9 +320,9 @@ class LocusCollection:
     def extend(self,newList):
         for lcs in newList: self.__addLocus(lcs)
     def hasLocus(self,locus):
-        return self.__loci.has_key(locus)
+        return locus in self.__loci
     def remove(self,old):
-        if not(self.__loci.has_key(old)): raise ValueError("requested locus isn't in collection")
+        if not(old in self.__loci): raise ValueError("requested locus isn't in collection")
         del self.__loci[old]
         if old.sense()=='.': senseList = ['+','-']
         else: senseList = [old.sense()]
@@ -331,13 +331,13 @@ class LocusCollection:
                 self.__chrToCoordToLoci[old.chr()+sense][k].remove(old)
 
     def getWindowSize(self): return self.__winSize
-    def getLoci(self): return self.__loci.keys()
+    def getLoci(self): return list(self.__loci.keys())
     def getChrList(self):
         # i need to remove the strand info from the chromosome keys and make
         # them non-redundant.
         tempKeys = dict()
-        for k in self.__chrToCoordToLoci.keys(): tempKeys[k[:-1]] = None
-        return tempKeys.keys()
+        for k in list(self.__chrToCoordToLoci.keys()): tempKeys[k[:-1]] = None
+        return list(tempKeys.keys())
             
     def __subsetHelper(self,locus,sense):
         sense = sense.lower()
@@ -351,12 +351,12 @@ class LocusCollection:
         else: raise ValueError("sense value was inappropriate: '"+sense+"'.")
         for s in filter(lamb, senses):
             chrKey = locus.chr()+s
-            if self.__chrToCoordToLoci.has_key(chrKey):
+            if chrKey in self.__chrToCoordToLoci:
                 for n in self.__getKeyRange(locus):
-                    if self.__chrToCoordToLoci[chrKey].has_key(n):
+                    if n in self.__chrToCoordToLoci[chrKey]:
                         for lcs in self.__chrToCoordToLoci[chrKey][n]:
                             matches[lcs] = None
-        return matches.keys()
+        return list(matches.keys())
         
     # sense can be 'sense' (default), 'antisense', or 'both'
     # returns all members of the collection that overlap the locus
@@ -365,12 +365,12 @@ class LocusCollection:
         ### now, get rid of the ones that don't really overlap
         realMatches = dict()
         if sense=='sense' or sense=='both':
-            for i in filter(lambda lcs: lcs.overlaps(locus), matches):
+            for i in [lcs for lcs in matches if lcs.overlaps(locus)]:
                 realMatches[i] = None
         if sense=='antisense' or sense=='both':
-            for i in filter(lambda lcs: lcs.overlapsAntisense(locus), matches):
+            for i in [lcs for lcs in matches if lcs.overlapsAntisense(locus)]:
                 realMatches[i] = None 
-        return realMatches.keys()
+        return list(realMatches.keys())
 
     # sense can be 'sense' (default), 'antisense', or 'both'
     # returns all members of the collection that are contained by the locus
@@ -379,12 +379,12 @@ class LocusCollection:
         ### now, get rid of the ones that don't really overlap
         realMatches = dict()
         if sense=='sense' or sense=='both':
-            for i in filter(lambda lcs: locus.contains(lcs), matches):
+            for i in [lcs for lcs in matches if locus.contains(lcs)]:
                 realMatches[i] = None
         if sense=='antisense' or sense=='both':
-            for i in filter(lambda lcs: locus.containsAntisense(lcs), matches):
+            for i in [lcs for lcs in matches if locus.containsAntisense(lcs)]:
                 realMatches[i] = None
-        return realMatches.keys()
+        return list(realMatches.keys())
 
     # sense can be 'sense' (default), 'antisense', or 'both'
     # returns all members of the collection that contain the locus
@@ -393,12 +393,12 @@ class LocusCollection:
         ### now, get rid of the ones that don't really overlap
         realMatches = dict()
         if sense=='sense' or sense=='both':
-            for i in filter(lambda lcs: lcs.contains(locus), matches):
+            for i in [lcs for lcs in matches if lcs.contains(locus)]:
                 realMatches[i] = None
         if sense=='antisense' or sense=='both':
-            for i in filter(lambda lcs: lcs.containsAntisense(locus), matches):
+            for i in [lcs for lcs in matches if lcs.containsAntisense(locus)]:
                 realMatches[i] = None
-        return realMatches.keys()
+        return list(realMatches.keys())
 
     def stitchCollection(self,stitchWindow=1,sense='both'):
 
@@ -495,12 +495,12 @@ def makeTranscriptCollection(annotFile,upSearch,downSearch,window = 500,geneList
     takes in a refseqfile
     '''
 
-    if upper(annotFile).count('REFSEQ') == 1:
+    if annotFile.upper().count('REFSEQ') == 1:
         refseqTable,refseqDict = importRefseq(annotFile)
         locusList = []
         ticker = 0
         if len(geneList) == 0:
-            geneList =refseqDict.keys()
+            geneList =list(refseqDict.keys())
         for line in refseqTable[1:]:
             if geneList.count(line[1]) > 0:
                 if line[3] == '-':
@@ -558,27 +558,26 @@ def checkChrStatus(bamFile):
     stats.stdout.close()
     chrPattern = re.compile('chr')
     for line in statLines:
-      #print line
-      sline = line.split("\t")
-      #print sline[2]
-      if re.search(chrPattern, sline[2]):
-	return 1
-      else:
-	return 0
-	    
+        #print line
+        line = line.decode("utf-8")
+        sline = line.split("\t")
+        #print sline[2]
+        if re.search(chrPattern, sline[2]):
+            return 1
+        else:
+            return 0
+
 def convertBitwiseFlag(flag):
-   if int(flag) & 16:
-	return "-";
-   else:
-	return "+";
+    if int(flag) & 16:
+        return "-"
+    else:
+        return "+"
            
 class Bam:
     '''A class for a sorted and indexed bam file that allows easy analysis of reads'''
     def __init__(self,bamFile):
         self._bam = bamFile
-        
 
-	  
     def getTotalReads(self,readType = 'mapped'):
         command = 'samtools flagstat %s' % (self._bam)
         stats = subprocess.Popen(command,stdin = subprocess.PIPE,stderr = subprocess.PIPE,stdout = subprocess.PIPE,shell = True)
@@ -586,6 +585,7 @@ class Bam:
         stats.stdout.close()
         if readType == 'mapped':
             for line in statLines:
+                line = line.decode("utf-8")
                 if line.count('mapped (') == 1:
                     
                     return int(line.split(' ')[0])
@@ -593,10 +593,10 @@ class Bam:
             return int(statLines[0].split(' ')[0])
     
     def convertBitwiseFlag(self,flag):
-      if flag & 16:
-	return "-";
-      else:
-	return "+";
+        if flag & 16:
+            return "-"
+        else:
+            return "+"
 
     def getRawReads(self,locus,sense,unique = False,includeJxnReads = False,printCommand = False):
         '''
@@ -610,10 +610,11 @@ class Bam:
             print(command)
         getReads = subprocess.Popen(command,stdin = subprocess.PIPE,stderr = subprocess.PIPE,stdout = subprocess.PIPE,shell = True)
         reads = getReads.communicate()
-        reads = reads[0].split('\n')[:-1]
+        reads = reads[0].decode("utf-8")
+        reads = reads.split('\n')[:-1]
         reads = [read.split('\t') for read in reads]
         if includeJxnReads == False:
-            reads = filter(lambda x: x[5].count('N') < 1,reads)
+            reads = [x for x in reads if x[5].count('N') < 1]
 
         #convertDict = {'16':'-','0':'+','64':'+','65':'+','80':'-','81':'-','129':'+','145':'-'}
         convertDict = {'16':'-','0':'+','64':'+','65':'+','80':'-','81':'-','129':'+','145':'-','256':'+','272':'-','99':'+','147':'-'}
@@ -632,7 +633,7 @@ class Bam:
             strand = locus.sense()
         for read in reads:
             #readStrand = read[1].translate(convert)[0]
-	    #print read[1], read[0]
+            #print read[1], read[0]
             #readStrand = convertDict[read[1]]
             readStrand = convertBitwiseFlag(read[1])
 
@@ -657,7 +658,7 @@ class Bam:
             return
         #convert = string.maketrans('160','--+')
         #convertDict = {'16':'-','0':'+','64':'+','65':'+','80':'-','81':'-','129':'+','145':'-'}
-	#convertDict = {'16':'-','0':'+','64':'+','65':'+','80':'-','81':'-','129':'+','145':'-','256':'+','272':'-'}
+        #convertDict = {'16':'-','0':'+','64':'+','65':'+','80':'-','81':'-','129':'+','145':'-','256':'+','272':'-'}
         
         #BJA added 256 and 272, which correspond to 0 and 16 for multi-mapped reads respectively:
         #http://onetipperday.blogspot.com/2012/04/understand-flag-code-of-sam-format.html
@@ -682,7 +683,7 @@ class Bam:
                 #then it filters out the '' and converts them to integers
                 #only works for reads that span one junction
                 
-                [first,gap,second] = [int(x) for x in filter(lambda x: len(x) > 0, re.findall(numPattern,read[5]))][0:3]
+                [first,gap,second] = [int(x) for x in [x for x in re.findall(numPattern,read[5]) if len(x) > 0]][0:3]
                 if IDtag == 'sequence':
                     loci.append(Locus(chrom,start,start+first,strand,ID[0:first]))
                     loci.append(Locus(chrom,start+first+gap,start+first+gap+second,strand,ID[first:]))
@@ -771,7 +772,7 @@ def order(x, NoneIsLast = True, decreasing = False):
         omitNone = True
         
     n  = len(x)
-    ix = range(n)
+    ix = list(range(n))
     if None not in x:
         ix.sort(reverse = decreasing, key = lambda j : x[j])
     else:
@@ -783,7 +784,7 @@ def order(x, NoneIsLast = True, decreasing = False):
                 return not(elem is None), elem
             else:
                 return elem is None, elem
-        ix = range(n)
+        ix = list(range(n))
         ix.sort(key=key, reverse=decreasing)
             
     if omitNone:
