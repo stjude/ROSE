@@ -35,6 +35,7 @@ CLONED using SOURCETREE from: https://bitbucket.org/young_computation/rose/src/m
 
 	* samtools
 	* R version > 3.4
+	* bedtools > 2
 	* python2
 
 3) USAGE
