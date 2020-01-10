@@ -141,8 +141,8 @@ if(wceName == 'NONE'){
 }else{
 	plot(length(rankBy_vector):1,rankBy_vector[signalOrder], col='red',xlab=paste(rankBy_factor,'_enhancers'),ylab=paste(rankBy_factor,' Signal','- ',wceName),pch=19,cex=2)
 }
-abline(h=cutoff_options$absolute,color='grey',lty=2)
-abline(v=length(rankBy_vector)-length(superEnhancerRows),color='grey',lty=2)
+abline(h=cutoff_options$absolute,col='grey',lty=2)
+abline(v=length(rankBy_vector)-length(superEnhancerRows),col='grey',lty=2)
 lines(length(rankBy_vector):1,rankBy_vector[signalOrder],lwd=4, col='red')
 text(0,0.8*max(rankBy_vector),paste(' Cutoff used: ',cutoff_options$absolute,'\n','Super-Enhancers identified: ',length(superEnhancerRows)),pos=4)
 

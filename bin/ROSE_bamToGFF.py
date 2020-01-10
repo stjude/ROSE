@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #bamToGFF.py
 
 #script to grab reads from a bam that align to a .gff file
@@ -12,7 +12,7 @@ from collections import defaultdict
 
 import os
 
-from string import join,upper,maketrans
+import string
 
 
 
@@ -41,16 +41,16 @@ def mapBamToGFF(bamFile,gff,sense = 'both',extension = 200,floor = 0,rpm = False
     else:
         MMR = 1
 
-    print('using a MMR value of %s' % (MMR))
+    print(('using a MMR value of %s' % (MMR)))
     
-    senseTrans = maketrans('-+.','+-+')
+    #senseTrans = maketrans('-+.','+-+') #deprecated
 
     if ROSE_utils.checkChrStatus(bamFile) == 1:
-      print "has chr"
+      print("has chr")
       hasChrFlag = 1
       #sys.exit();
     else:
-      print "does not have chr"
+      print("does not have chr")
       hasChrFlag = 0
       #sys.exit()
       
@@ -67,10 +67,10 @@ def mapBamToGFF(bamFile,gff,sense = 'both',extension = 200,floor = 0,rpm = False
     for line in gff:
         line = line[0:9]
         if ticker%100 == 0:
-            print ticker
+            print(ticker)
         ticker+=1
         if not hasChrFlag:
-	  line[0] = re.sub(r"chr",r"",line[0])
+            line[0] = re.sub(r"chr",r"",line[0])
         gffLocus = ROSE_utils.Locus(line[0],int(line[3]),int(line[4]),line[6],line[1])
         #print line[0]
         #sys.exit()
@@ -86,11 +86,11 @@ def mapBamToGFF(bamFile,gff,sense = 'both',extension = 200,floor = 0,rpm = False
                 locus = ROSE_utils.Locus(locus.chr(),locus.start()-extension,locus.end(),locus.sense(),locus.ID())
             extendedReads.append(locus)
         if gffLocus.sense() == '+' or gffLocus.sense == '.':
-            senseReads = filter(lambda x:x.sense() == '+' or x.sense() == '.',extendedReads)
-            antiReads = filter(lambda x:x.sense() == '-',extendedReads)
+            senseReads = [x for x in extendedReads if x.sense() == '+' or x.sense() == '.']
+            antiReads = [x for x in extendedReads if x.sense() == '-']
         else:
-            senseReads = filter(lambda x:x.sense() == '-' or x.sense() == '.',extendedReads)
-            antiReads = filter(lambda x:x.sense() == '+',extendedReads)
+            senseReads = [x for x in extendedReads if x.sense() == '-' or x.sense() == '.']
+            antiReads = [x for x in extendedReads if x.sense() == '+']
 
         senseHash = defaultdict(int)
         antiHash = defaultdict(int)
@@ -107,12 +107,12 @@ def mapBamToGFF(bamFile,gff,sense = 'both',extension = 200,floor = 0,rpm = False
                     antiHash[x]+=1
 
         #now apply flooring and filtering for coordinates
-        keys = ROSE_utils.uniquify(senseHash.keys()+antiHash.keys())
+        keys = ROSE_utils.uniquify(list(senseHash.keys())+list(antiHash.keys()))
         if floor > 0:
 
-            keys = filter(lambda x: (senseHash[x]+antiHash[x]) > floor,keys)
+            keys = [x for x in keys if (senseHash[x]+antiHash[x]) > floor]
         #coordinate filtering
-        keys = filter(lambda x: gffLocus.start() < x < gffLocus.end(),keys)
+        keys = [x for x in keys if gffLocus.start() < x < gffLocus.end()]
 
 
         #setting up the output table
@@ -131,7 +131,7 @@ def mapBamToGFF(bamFile,gff,sense = 'both',extension = 200,floor = 0,rpm = False
 
             while n <nBins:
                 n+=1
-                binKeys = filter(lambda x: i < x < i+binSize,keys)
+                binKeys = [x for x in keys if i < x < i+binSize]
                 binDen = float(sum([senseHash[x]+antiHash[x] for x in binKeys]))/binSize
                 clusterLine+=[round(binDen/MMR,4)]
                 i = i+binSize
@@ -139,7 +139,7 @@ def mapBamToGFF(bamFile,gff,sense = 'both',extension = 200,floor = 0,rpm = False
             i = gffLocus.end()
             while n < nBins:
                 n+=1
-                binKeys = filter(lambda x: i-binSize < x < i,keys)
+                binKeys = [x for x in keys if i-binSize < x < i]
                 binDen = float(sum([senseHash[x]+antiHash[x] for x in binKeys]))/binSize
                 clusterLine+=[round(binDen/MMR,4)]
                 i = i-binSize
@@ -192,7 +192,7 @@ def main():
         bamFile = options.bam
         fullPath = os.path.abspath(bamFile)
         bamName = fullPath.split('/')[-1].split('.')[0]
-        pathFolder = join(fullPath.split('/')[0:-1],'/')
+        pathFolder = '/'.join(fullPath.split('/')[0:-1])
         fileList = os.listdir(pathFolder)
         hasBai = False
         for fileName in fileList:
