@@ -6,20 +6,40 @@ CLONED using SOURCETREE from: https://bitbucket.org/young_computation/rose/src/m
 
 
 #### === Changelog
+1) USAGE
+
+- Option 1: To run the program locally and independent of software location by calling ROSE-local.sh
+	NB: First open ROSE-local.sh and modify PATHTO with the PATH ROSE is installed in.
+	> ROSE-local.sh ["GTF file"] ["BAM file"] ["OutputDir"] ["feature type"] ["species"] ["bed fileA"] ["bed fileB"]
+
+- Option 2: Add ROSE to user executable $PATH
+	```bash
+	PATHTO=/path/to/ROSE
+	PYTHONPATH=$PATHTO/lib
+	export PYTHONPATH
+	export PATH=$PATH:$PATHTO/bin
+	```
+
+1) Update: 
+
+* ROSE is executable independent of software directory location.
+* ROSE has a wrapper script "ROSE-local.sh" to successfully execute all steps of the package, else add ROSE to user executable $PATH
+* ROSE is compatible with python3
+
 1) DIRECTORY structure
 
     ├── LICENSE.txt
 
     ├── README.md
 
-    ├── ROSE-call.sh    : bash wrapper
+    ├── ROSE-local.sh    : bash wrapper
 
     ├── lib
 
         └── ROSE_utils.py   : utilities method
     │   
 
-    └── src
+    └── bin
     
         ├── ROSE_bamToGFF.py    : calculates density of .bam reads in .gff regions
     
@@ -31,17 +51,11 @@ CLONED using SOURCETREE from: https://bitbucket.org/young_computation/rose/src/m
 
     Total: 2 directories, 8 files
 
-2) DEPENDENCIES
+1) DEPENDENCIES
 
 	* samtools
 	* R version > 3.4
 	* bedtools > 2
 	* python3
-
-3) USAGE
-
-Program is run by calling ROSE-call.sh
-NB: First modify PATHTO with your own directory. 
-> ROSE-call.sh ["GTF file"] ["BAM file"] ["OutputDir"] ["feature type"] ["species"] ["bed fileA"] ["bed fileB"]
 
 =================================================================
