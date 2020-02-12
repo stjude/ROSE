@@ -27,7 +27,7 @@ CLONED using SOURCETREE from: https://bitbucket.org/young_computation/rose/src/m
 	* ROSE is compatible with python3
 
 1. DIRECTORY structure
-	```bash
+	```
 	├── LICENSE.txt
 	│
 	├── README.md
