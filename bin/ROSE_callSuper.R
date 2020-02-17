@@ -81,8 +81,8 @@ writeSuperEnhancer_table <- function(superEnhancer,description,outputFile,additi
 
 args <- commandArgs()
 
-#print('THESE ARE THE ARGUMENTS')
-#print(args)
+print('THESE ARE THE ARGUMENTS')
+print(args)
 
 #ARGS
 outFolder = args[6] #3
