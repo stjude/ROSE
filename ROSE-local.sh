@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Rose Caller to detect both Enhancers and Super-Enhancers
-#
+# Hardcoded implementation of ROSE for St. Jude, Abraham's lab.
 # Version 1 11/16/2019
 
 ##############################################################
@@ -38,7 +38,7 @@ FEATURE=${FEATURE:=gene}
 
 # Species
 SPECIES=$5
-SPECIES=${SPECIES:=hg_19}
+SPECIES=${SPECIES:=hg19}
 
 # Bed File A
 FILEA=$6
@@ -67,7 +67,8 @@ echo "Species: $SPECIES"
 echo "Feature type: $FEATURE"
 #================================================================================
 # 
-# GENERATING UCSC REFSEQ FILE
+# UCSC TRACK FORMAT ANNOTATION FILE 
+# Generate UCSC table track annotation file using NCBI GTF refseq.
 #
 mkdir -p annotation
 echo -e "#bin\tname\tchrom\tstrand\ttxStart\ttxEnd\tcdsStart\tcdsEnd\tX\tX\tX\t\tX\tname2" > annotation/$SPECIES"_refseq.ucsc"
@@ -85,14 +86,14 @@ fi
 echo "Annotation file: "$SPECIES"_refseq.ucsc"
 
 #
-# GENERATING MERGE BED FILES
-#
+# INPUT CONSTITUENT FILE
+# merge peak bed files generated from MACS1 "keep_dup=all" and "keep_dup=auto" to generate constituent enhancers.
 cat $FILEA $FILEB | sort -k1,1 -k2,2n | mergeBed -i - | awk -F\\t '{print $1 "\t" NR "\t\t" $2 "\t" $3 "\t\t.\t\t" NR}' > unionpeaks.gff
 echo "Merge Bed file: unionpeaks.gff"
 echo
 
 #
-# ROSE CALLER
+# ROSE
 #
 ROSE_main.py -s $STITCH -t $TSS -g $SPECIES -i unionpeaks.gff -r $BAMFILE -o $OUTPUTDIR
 
