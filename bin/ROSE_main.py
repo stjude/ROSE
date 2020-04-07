@@ -227,7 +227,7 @@ def main():
     parser.add_option("-o","--out", dest="out",nargs = 1, default=None,
                       help = "Enter an output folder")
     parser.add_option("-g","--genome", dest="genome",nargs = 1, default=None,
-                      help = "Enter the genome build (MM9,MM8,HG18,HG19)")
+                      help = "Enter the genome build (MM9,MM8,HG18,HG19,HG38)")
     
     #optional flags
     parser.add_option("-b","--bams", dest="bams",nargs = 1, default=None,
@@ -316,6 +316,7 @@ def main():
         'HG18':'%s/annotation/hg18_refseq.ucsc' % (cwd),
         'MM9': '%s/annotation/mm9_refseq.ucsc' % (cwd),
         'HG19':'%s/annotation/hg19_refseq.ucsc' % (cwd),
+        'HG38':'%s/annotation/hg38_refseq.ucsc' % (cwd),
         'MM8': '%s/annotation/mm8_refseq.ucsc' % (cwd),
         'MM10':'%s/annotation/mm10_refseq.ucsc' % (cwd),
         }
