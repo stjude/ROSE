@@ -217,6 +217,8 @@ def main():
                       help = "Enter a ROSE ranked enhancer or super-enhancer file")
     parser.add_option("-g","--genome", dest="genome",nargs = 1, default=None,
                       help = "Enter the genome build (MM9,MM8,HG18,HG19,HG38)")
+    parser.add_option("--custom", dest="custom_genome", default=None,
+                      help = "Enter the custom genome annotation .ucsc")
 
     #optional flags
     parser.add_option("-l","--list", dest="geneList",nargs = 1, default=None,
@@ -230,7 +232,7 @@ def main():
     (options,args) = parser.parse_args()
 
 
-    if not options.input or not options.genome:
+    if not options.input or not (options.genome or options.custom_genome):
 
         parser.print_help()
         exit()
@@ -245,11 +247,6 @@ def main():
         outFolder = '/'.join(enhancerFile.split('/')[0:-1]) + '/'
 
 
-    #GETTING THE GENOME
-    genome = options.genome
-    print(('USING %s AS THE GENOME' % genome))
-
-
     #GETTING THE CORRECT ANNOT FILE
     cwd = os.getcwd()
     genomeDict = {
@@ -261,7 +258,14 @@ def main():
         'MM10':'%s/annotation/mm10_refseq.ucsc' % (cwd),
         }
 
-    annotFile = genomeDict[genome.upper()]
+    #GETTING THE GENOME
+    if options.custom_genome:
+        annotFile = options.custom_genome
+        print('USING CUSTOM GENOME %s AS THE GENOME FILE' % options.custom_genome)
+    else:
+        genome = options.genome
+        annotFile = genomeDict[genome.upper()]
+        print('USING %s AS THE GENOME' % genome)
 
     #GETTING THE TRANSCRIBED LIST
     if options.geneList:

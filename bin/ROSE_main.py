@@ -226,8 +226,10 @@ def main():
                       help = "bamfile to rank enhancer by")
     parser.add_option("-o","--out", dest="out",nargs = 1, default=None,
                       help = "Enter an output folder")
-    parser.add_option("-g","--genome", dest="genome",nargs = 1, default=None,
+    parser.add_option("-g","--genome", dest="genome", default=None,
                       help = "Enter the genome build (MM9,MM8,HG18,HG19,HG38)")
+    parser.add_option("--custom", dest="custom_genome", default=None,
+                      help = "Enter the custom genome annotation .ucsc")
     
     #optional flags
     parser.add_option("-b","--bams", dest="bams",nargs = 1, default=None,
@@ -246,7 +248,7 @@ def main():
     (options,args) = parser.parse_args()
 
 
-    if not options.input or not options.rankby or not options.out or not options.genome:
+    if not options.input or not options.rankby or not options.out or not (options.genome or options.custom_genome):
         print('hi there')
         parser.print_help()
         exit()
@@ -304,12 +306,6 @@ def main():
     print(('USING %s AS THE INPUT GFF' % (inputGFFFile)))
     inputName = inputGFFFile.split('/')[-1].split('.')[0]
 
-
-    #GETTING THE GENOME
-    genome = options.genome
-    print(('USING %s AS THE GENOME' % genome))
-
-
     #GETTING THE CORRECT ANNOT FILE
     cwd = os.getcwd()
     genomeDict = {
@@ -321,7 +317,15 @@ def main():
         'MM10':'%s/annotation/mm10_refseq.ucsc' % (cwd),
         }
 
-    annotFile = genomeDict[genome.upper()]
+    #GETTING THE GENOME
+    if options.custom_genome:
+        annotFile = options.custom_genome
+        print('USING CUSTOM GENOME %s AS THE GENOME FILE' % options.custom_genome)
+    else:
+        genome = options.genome
+        annotFile = genomeDict[genome.upper()]
+        print('USING %s AS THE GENOME' % genome)
+
 
     #MAKING THE START DICT
     print('MAKING START DICT')

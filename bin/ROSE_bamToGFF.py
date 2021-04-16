@@ -116,7 +116,13 @@ def mapBamToGFF(bamFile,gff,sense = 'both',extension = 200,floor = 0,rpm = False
 
 
         #setting up the output table
-        clusterLine = [gffLocus.ID(),gffLocus.__str__()]
+        #clusterLine = [gffLocus.ID(),gffLocus.__str__()]
+
+        # bug fix gff coordinates with same chromosomal name as BAM
+        if not hasChrFlag:
+            clusterLine = [gffLocus.ID(),"chr" + gffLocus.__str__()]
+        else: 
+           clusterLine = [gffLocus.ID(),gffLocus.__str__()]
 
         #getting the binsize
         binSize = (gffLocus.len()-1)/int(matrix)
