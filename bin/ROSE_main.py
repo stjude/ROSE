@@ -369,7 +369,7 @@ def main():
 
 
     #SETTING UP THE OVERALL OUTPUT FILE
-    outputFile1 = outFolder + stitchedGFFName + '_STITCHED_REGION_MAP.txt'
+    outputFile1 = outFolder + stitchedGFFName + '_REGION_MAP.txt'
 
     print(('OUTPUT WILL BE WRITTEN TO  %s' % (outputFile1)))
     
@@ -475,14 +475,22 @@ def main():
     #calling the gene mapper
     time.sleep(60)
     superTableFile = "%s/%s_SuperStitched.table.txt" % (outFolder,inputName)
-    cmd = "ROSE_geneMapper.py -g %s -i %s -r TRUE" % (genome,superTableFile)
-    print(cmd)
-    os.system(cmd)
-    
     allTableFile = "%s/%s_AllStitched.table.txt" % (outFolder,inputName)
-    cmd = "ROSE_geneMapper.py -g %s -i %s -r TRUE" % (genome,allTableFile)
-    print(cmd)
-    os.system(cmd)
+
+    if options.custom_genome:
+	cmd1 = "ROSE_geneMapper.py --custom %s -i %s -r TRUE" % (options.custom_genome,superTableFile)
+        cmd2 = "ROSE_geneMapper.py --custom %s -i %s -r TRUE" % (options.custom_genome,allTableFile)
+    else:
+        cmd1 = "ROSE_geneMapper.py -g %s -i %s -r TRUE" % (genome,superTableFile)
+        cmd2 = "ROSE_geneMapper.py -g %s -i %s -r TRUE" % (genome,allTableFile)
+
+    #gene mapper for superenhancers
+    print(cmd1)
+    os.system(cmd1)
+    
+    #gene mapper for enhancers
+    print(cmd2)
+    os.system(cmd2)
     
 if __name__ == "__main__":
     main()
