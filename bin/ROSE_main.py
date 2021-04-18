@@ -478,7 +478,7 @@ def main():
     allTableFile = "%s/%s_AllStitched.table.txt" % (outFolder,inputName)
 
     if options.custom_genome:
-	cmd1 = "ROSE_geneMapper.py --custom %s -i %s -r TRUE" % (options.custom_genome,superTableFile)
+        cmd1 = "ROSE_geneMapper.py --custom %s -i %s -r TRUE" % (options.custom_genome,superTableFile)
         cmd2 = "ROSE_geneMapper.py --custom %s -i %s -r TRUE" % (options.custom_genome,allTableFile)
     else:
         cmd1 = "ROSE_geneMapper.py -g %s -i %s -r TRUE" % (genome,superTableFile)
