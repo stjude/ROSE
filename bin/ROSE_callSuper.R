@@ -61,7 +61,7 @@ writeSuperEnhancer_table <- function(superEnhancer,description,outputFile,additi
 	cat(description,"\n",file=outputFile)
 	if(is.matrix(additionalData)){
 		if(nrow(additionalData)!=nrow(superEnhancer)){
-			warning("Additional data does not have the same number of rows as the number of super enhancers.\n--->>> ADDITIONAL DATA NOT INCLUDED <<<---\n")
+			warning("Additional data does not have the same number of rows as the number of super stitched peaks.\n--->>> ADDITIONAL DATA NOT INCLUDED <<<---\n")
 		}else{
 			superEnhancer <- cbind(superEnhancer,additionalData)
 			superEnhancer = superEnhancer[order(superEnhancer$enhancerRank),]
@@ -122,7 +122,7 @@ rankBy_vector[rankBy_vector < 0] <- 0
 
 #FIGURING OUT THE CUTOFF
 
-cutoff_options <- calculate_cutoff(rankBy_vector, drawPlot=FALSE,xlab=paste(rankBy_factor,'_enhancers'),ylab=paste(rankByFactor,' Signal','- ',wceName),lwd=2,col=4)
+cutoff_options <- calculate_cutoff(rankBy_vector, drawPlot=FALSE,xlab=paste(rankBy_factor,' Stitched peaks'),ylab=paste(rankByFactor,' Signal','- ',wceName),lwd=2,col=4)
 
 
 #These are the super-enhancers
@@ -136,15 +136,15 @@ plotFileName = paste(outFolder,enhancerName,'_Plot_points.png',sep='')
 png(filename=plotFileName,height=600,width=600)
 signalOrder = order(rankBy_vector,decreasing=TRUE)
 if(wceName == 'NONE'){
-	plot(length(rankBy_vector):1,rankBy_vector[signalOrder], col='red',xlab=paste(rankBy_factor,'_enhancers'),ylab=paste(rankBy_factor,' Signal'),pch=19,cex=2)	
+	plot(length(rankBy_vector):1,rankBy_vector[signalOrder], col='red',xlab=paste(rankBy_factor,' Stitched peaks'),ylab=paste(rankBy_factor,' Signal'),pch=19,cex=2)	
 	
 }else{
-	plot(length(rankBy_vector):1,rankBy_vector[signalOrder], col='red',xlab=paste(rankBy_factor,'_enhancers'),ylab=paste(rankBy_factor,' Signal','- ',wceName),pch=19,cex=2)
+	plot(length(rankBy_vector):1,rankBy_vector[signalOrder], col='red',xlab=paste(rankBy_factor,' Stitched peaks'),ylab=paste(rankBy_factor,' Signal','- ',wceName),pch=19,cex=2)
 }
 abline(h=cutoff_options$absolute,col='grey',lty=2)
 abline(v=length(rankBy_vector)-length(superEnhancerRows),col='grey',lty=2)
 lines(length(rankBy_vector):1,rankBy_vector[signalOrder],lwd=4, col='red')
-text(0,0.8*max(rankBy_vector),paste(' Cutoff used: ',cutoff_options$absolute,'\n','Super-Enhancers identified: ',length(superEnhancerRows)),pos=4)
+text(0,0.8*max(rankBy_vector),paste(' Cutoff used: ',cutoff_options$absolute,'\n','Super-Stitched peaks identified: ',length(superEnhancerRows)),pos=4)
 
 dev.off()
 
@@ -152,8 +152,8 @@ dev.off()
 
 
 #Writing a bed file
-bedFileName = paste(outFolder,enhancerName,'_Enhancers_withSuper.bed',sep='')
-convert_stitched_to_bed(stitched_regions,paste(rankBy_factor,"Enhancers"), enhancerDescription,bedFileName,score=rankBy_vector,splitSuper=TRUE,superRows= superEnhancerRows,baseColor="0,0,0",superColor="255,0,0")
+bedFileName = paste(outFolder,enhancerName,'_Stitched_withSuper.bed',sep='')
+convert_stitched_to_bed(stitched_regions,paste(rankBy_factor,"Stitched"), enhancerDescription,bedFileName,score=rankBy_vector,splitSuper=TRUE,superRows= superEnhancerRows,baseColor="0,0,0",superColor="255,0,0")
 
 
 
@@ -168,8 +168,8 @@ additionalTableData[superEnhancerRows,2] <- 1
 
 
 #Writing enhancer and super-enhancer tables with enhancers ranked and super status annotated
-enhancerTableFile = paste(outFolder,enhancerName,'_AllEnhancers.table.txt',sep='')
+enhancerTableFile = paste(outFolder,enhancerName,'_AllStitched.table.txt',sep='')
 writeSuperEnhancer_table(stitched_regions, enhancerDescription,enhancerTableFile, additionalData= additionalTableData)
 
-superTableFile = paste(outFolder,enhancerName,'_SuperEnhancers.table.txt',sep='')
+superTableFile = paste(outFolder,enhancerName,'_SuperStitched.table.txt',sep='')
 writeSuperEnhancer_table(true_super_enhancers, enhancerDescription,superTableFile, additionalData= additionalTableData[superEnhancerRows,])

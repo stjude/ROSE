@@ -280,11 +280,11 @@ def main():
     enhancerFileName = enhancerFile.split('/')[-1].split('.')[0]
 
     #writing the enhancer table
-    out1 = '%s%s_ENHANCER_TO_GENE.txt' % (outFolder,enhancerFileName)
+    out1 = '%s%s_REGION_TO_GENE.txt' % (outFolder,enhancerFileName)
     ROSE_utils.unParseTable(enhancerToGeneTable,out1,'\t')
 
     #writing the gene table
-    out2 = '%s%s_GENE_TO_ENHANCER.txt' % (outFolder,enhancerFileName)
+    out2 = '%s%s_GENE_TO_REGION.txt' % (outFolder,enhancerFileName)
     ROSE_utils.unParseTable(geneToEnhancerTable,out2,'\t')
 
 if __name__ == "__main__":

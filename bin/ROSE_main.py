@@ -369,7 +369,7 @@ def main():
 
 
     #SETTING UP THE OVERALL OUTPUT FILE
-    outputFile1 = outFolder + stitchedGFFName + '_ENHANCER_REGION_MAP.txt'
+    outputFile1 = outFolder + stitchedGFFName + '_STITCHED_REGION_MAP.txt'
 
     print(('OUTPUT WILL BE WRITTEN TO  %s' % (outputFile1)))
     
@@ -474,12 +474,12 @@ def main():
     
     #calling the gene mapper
     time.sleep(60)
-    superTableFile = "%s/%s_SuperEnhancers.table.txt" % (outFolder,inputName)
+    superTableFile = "%s/%s_SuperStitched.table.txt" % (outFolder,inputName)
     cmd = "ROSE_geneMapper.py -g %s -i %s -r TRUE" % (genome,superTableFile)
     print(cmd)
     os.system(cmd)
     
-    allTableFile = "%s/%s_AllEnhancers.table.txt" % (outFolder,inputName)
+    allTableFile = "%s/%s_AllStitched.table.txt" % (outFolder,inputName)
     cmd = "ROSE_geneMapper.py -g %s -i %s -r TRUE" % (genome,allTableFile)
     print(cmd)
     os.system(cmd)
