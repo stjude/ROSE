@@ -229,7 +229,7 @@ def main():
     parser.add_option("-g","--genome", dest="genome", default=None,
                       help = "Enter the genome build (MM9,MM8,HG18,HG19,HG38)")
     parser.add_option("--custom", dest="custom_genome", default=None,
-                      help = "Enter the custom genome annotation .ucsc")
+                      help = "Enter the custom genome annotation refseq.ucsc")
     
     #optional flags
     parser.add_option("-b","--bams", dest="bams",nargs = 1, default=None,
