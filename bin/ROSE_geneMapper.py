@@ -70,7 +70,7 @@ def mapEnhancerToGene(annotFile,enhancerFile,transcribedFile='',uniqueGenes=True
     enhancerToGeneTable = [enhancerTable[5][0:6]+['OVERLAP_GENES','PROXIMAL_GENES','CLOSEST_GENE'] + enhancerTable[5][-2:]]
     
     #next by gene
-    geneToEnhancerTable = [['GENE_NAME','REFSEQ_ID','PROXIMAL_ENHANCERS']]
+    geneToEnhancerTable = [['GENE_NAME','REFSEQ_ID','PROXIMAL_STITCHED_PEAKS']]
 
 
     for line in enhancerTable[6:]:
