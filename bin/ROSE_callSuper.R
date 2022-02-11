@@ -64,7 +64,7 @@ writeSuperEnhancer_table <- function(superEnhancer,description,outputFile,additi
 			warning("Additional data does not have the same number of rows as the number of super stitched peaks.\n--->>> ADDITIONAL DATA NOT INCLUDED <<<---\n")
 		}else{
 			superEnhancer <- cbind(superEnhancer,additionalData)
-			superEnhancer = superEnhancer[order(superEnhancer$enhancerRank),]
+			superEnhancer = superEnhancer[order(superEnhancer$stitchedPeakRank),]
 			
 		}
 	}
@@ -128,7 +128,7 @@ cutoff_options <- calculate_cutoff(rankBy_vector, drawPlot=FALSE,xlab=paste(rank
 #These are the super-enhancers
 superEnhancerRows <- which(rankBy_vector> cutoff_options$absolute)
 typicalEnhancers = setdiff(1:nrow(stitched_regions),superEnhancerRows)
-enhancerDescription <- paste(enhancerName," Enhancers\nCreated from ", enhancerFile,"\nRanked by ",rankBy_factor,"\nUsing cutoff of ",cutoff_options$absolute," for Super-Enhancers",sep="",collapse="")
+enhancerDescription <- paste(enhancerName," Stitched Peaks\nCreated from ", enhancerFile,"\nRanked by ",rankBy_factor,"\nUsing cutoff of ",cutoff_options$absolute," for Super-Stitched Peaks",sep="",collapse="")
 
 
 #MAKING HOCKEY STICK PLOT
@@ -161,7 +161,7 @@ convert_stitched_to_bed(stitched_regions,paste(rankBy_factor,"Stitched"), enhanc
 true_super_enhancers <- stitched_regions[superEnhancerRows,]
 
 additionalTableData <- matrix(data=NA,ncol=2,nrow=nrow(stitched_regions))
-colnames(additionalTableData) <- c("enhancerRank","isSuper")
+colnames(additionalTableData) <- c("stitchedPeakRank","isSuper")
 additionalTableData[,1] <- nrow(stitched_regions)-rank(rankBy_vector,ties.method="first")+1
 additionalTableData[,2] <- 0
 additionalTableData[superEnhancerRows,2] <- 1

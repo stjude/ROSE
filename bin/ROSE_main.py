@@ -456,7 +456,7 @@ def main():
 
     time.sleep(10)
 
-    print('CALLING AND PLOTTING SUPER-ENHANCERS')
+    print('CALLING AND PLOTTING SUPER-STITCHED PEAKS')
 
 
     if options.control:
@@ -484,11 +484,11 @@ def main():
         cmd1 = "ROSE_geneMapper.py -g %s -i %s -r TRUE" % (genome,superTableFile)
         cmd2 = "ROSE_geneMapper.py -g %s -i %s -r TRUE" % (genome,allTableFile)
 
-    #gene mapper for superenhancers
+    #gene mapper for super-stitched peaks
     print(cmd1)
     os.system(cmd1)
     
-    #gene mapper for enhancers
+    #gene mapper for stitched peaks
     print(cmd2)
     os.system(cmd2)
     
