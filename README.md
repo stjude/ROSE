@@ -1,11 +1,8 @@
-===== ROSE: RANK ORDERING OF SUPER-ENHANCERS =====
-
-LICENSE: Information in LICENSE.txt. 
+# ROSE : RANK ORDERING OF SUPER-ENHANCERS
 
 CLONED using SOURCETREE from: https://bitbucket.org/young_computation/rose/src/master/
 
-
-#### === Changelog
+### Changes from Source.
 1. USAGE
 
 	```bash
@@ -21,6 +18,7 @@ CLONED using SOURCETREE from: https://bitbucket.org/young_computation/rose/src/m
 
 	* ROSE is executable independent of software directory location.
 	* ROSE is compatible with python3
+	* ROSE as a docker image ghcr.io/stjude/rose:latest
 
 1. REQUIREMENTS:
 
@@ -68,5 +66,3 @@ CLONED using SOURCETREE from: https://bitbucket.org/young_computation/rose/src/m
 	* R version > 3.4
 	* bedtools > 2
 	* python3
-
-=================================================================
