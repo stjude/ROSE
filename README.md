@@ -36,12 +36,14 @@ CLONED using SOURCETREE from: https://bitbucket.org/young_computation/rose/src/m
 
 	1. Peak file of constituent enhancers :
 	File must be in GFF format with the following columns:
-		1: chromosome (chr#)
-		2: unique ID for each constituent enhancer region
-		4: start of constituent
-		5: end of constituent
-		7: strand (+,-,.)
-		9: unique ID for each constituent enhancer region
+
+			column 1: chromosome (chr#)
+			column 2: unique ID for each constituent enhancer region
+			column 4: start of constituent
+			column 5: end of constituent
+			column 7: strand (+,-,.)
+			column 9: unique ID for each constituent enhancer region
+			
 		NOTE: if value for column 2 and 9 differ, value in column 2 will be used
 
 1. DIRECTORY structure
