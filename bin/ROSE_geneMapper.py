@@ -61,7 +61,7 @@ def mapEnhancerToGene(annotFile,enhancerFile,transcribedFile='',uniqueGenes=True
 
 
 
-    geneDict = {'overlapping':defaultdict(list),'proximal':defaultdict(list)}
+    geneDict = {'overlapping':defaultdict(list),'proximal':defaultdict(list),'enhancerString':defaultdict(list)}
     #list of all genes that appear in this analysis
     overallGeneList = []
 
@@ -72,12 +72,16 @@ def mapEnhancerToGene(annotFile,enhancerFile,transcribedFile='',uniqueGenes=True
     #next by gene
     geneToEnhancerTable = [['GENE_NAME','REFSEQ_ID','PROXIMAL_STITCHED_PEAKS']]
 
+    #have all information
+    signalWithGenes = [['GENE_NAME', 'REFSEQ_ID','PROXIMAL_STITCHED_PEAKS', 'SIGNAL']]
 
     for line in enhancerTable[6:]:
 
         enhancerString = '%s:%s-%s' % (line[1],line[2],line[3])
-        
+        enhancerSignal = int(float(line[6]) - float(line[7]))
+
         enhancerLocus = ROSE_utils.Locus(line[1],line[2],line[3],'.',line[0])
+
 
         #overlapping genes are transcribed genes whose transcript is directly in the stitchedLocus         
         overlappingLoci = transcribedCollection.getOverlap(enhancerLocus,'both')           
@@ -136,6 +140,7 @@ def mapEnhancerToGene(annotFile,enhancerFile,transcribedFile='',uniqueGenes=True
 
         #NOW WRITE THE ROW FOR THE ENHANCER TABLE
         newEnhancerLine = line[0:6]
+
         if byRefseq:
             newEnhancerLine.append(','.join(ROSE_utils.uniquify([x for x in overlappingGenes])))
             newEnhancerLine.append(','.join(ROSE_utils.uniquify([x for x in proximalGenes])))
@@ -158,20 +163,25 @@ def mapEnhancerToGene(annotFile,enhancerFile,transcribedFile='',uniqueGenes=True
         overallGeneList +=overlappingGenes
         for refID in overlappingGenes:
             geneDict['overlapping'][refID].append(enhancerString)
+            geneDict['enhancerString'][enhancerString].append(enhancerSignal)
         
 
         overallGeneList+=proximalGenes
         for refID in proximalGenes:
             geneDict['proximal'][refID].append(enhancerString)
+            geneDict['enhancerString'][enhancerString].append(enhancerSignal)
+
 
     #End loop through
     
     #Make table by gene
-    overallGeneList = ROSE_utils.uniquify(overallGeneList)  
+    overallGeneList = ROSE_utils.uniquify(overallGeneList)
+    
 
     nameOrder = ROSE_utils.order([startDict[x]['name'] for x in overallGeneList])
-        
+
     usedNames = []
+
     for i in nameOrder:
         refID = overallGeneList[i]
         geneName = startDict[refID]['name']
@@ -183,8 +193,11 @@ def mapEnhancerToGene(annotFile,enhancerFile,transcribedFile='',uniqueGenes=True
         
         proxEnhancers = geneDict['proximal'][refID] + geneDict['overlapping'][refID]
         
-    
         newLine = [geneName,refID,','.join(proxEnhancers)]
+
+        
+        for eachEnhancer in proxEnhancers:
+            signalWithGenes.append([geneName,refID,eachEnhancer,ROSE_utils.uniquify(geneDict['enhancerString'][eachEnhancer])[0]])
         geneToEnhancerTable.append(newLine)
 
     #re-sort enhancerToGeneTable
@@ -194,7 +207,7 @@ def mapEnhancerToGene(annotFile,enhancerFile,transcribedFile='',uniqueGenes=True
     for i in enhancerOrder:
         sortedTable.append(enhancerToGeneTable[(i+1)])
 
-    return sortedTable,geneToEnhancerTable
+    return sortedTable,geneToEnhancerTable,signalWithGenes
 
 
 
@@ -274,7 +287,7 @@ def main():
     else:
         transcribedFile = ''
 
-    enhancerToGeneTable,geneToEnhancerTable = mapEnhancerToGene(annotFile,enhancerFile,uniqueGenes=True,byRefseq=options.refseq, transcribedFile=transcribedFile)
+    enhancerToGeneTable,geneToEnhancerTable,withGenesTable = mapEnhancerToGene(annotFile,enhancerFile,uniqueGenes=True,byRefseq=options.refseq, transcribedFile=transcribedFile)
 
     #Writing enhancer output
     enhancerFileName = enhancerFile.split('/')[-1].split('.')[0]
@@ -286,6 +299,9 @@ def main():
     #writing the gene table
     out2 = '%s%s_GENE_TO_REGION.txt' % (outFolder,enhancerFileName)
     ROSE_utils.unParseTable(geneToEnhancerTable,out2,'\t')
+
+    out3 = '%s%s.table_withGENES.txt' % (outFolder,enhancerFileName)
+    ROSE_utils.unParseTable(withGenesTable,out3,'\t')
 
 if __name__ == "__main__":
     main()
