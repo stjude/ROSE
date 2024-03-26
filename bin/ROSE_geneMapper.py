@@ -25,7 +25,7 @@ from collections import defaultdict
 
 
 
-def mapEnhancerToGene(annotFile,enhancerFile,transcribedFile='',uniqueGenes=True,byRefseq=False):
+def mapEnhancerToGene(annotFile,enhancerFile,transcribedFile='',uniqueGenes=True,byRefseq=False,subtractInput=False):
     
     '''
     maps genes to enhancers. if uniqueGenes, reduces to gene name only. Otherwise, gives for each refseq
@@ -78,7 +78,8 @@ def mapEnhancerToGene(annotFile,enhancerFile,transcribedFile='',uniqueGenes=True
     for line in enhancerTable[6:]:
 
         enhancerString = '%s:%s-%s' % (line[1],line[2],line[3])
-        enhancerSignal = int(float(line[6]) - float(line[7]))
+        enhancerSignal = int(line[6])
+        if subtractInput: enhancerSignal = int(float(line[6]) - float(line[7]))
 
         enhancerLocus = ROSE_utils.Locus(line[1],line[2],line[3],'.',line[0])
 
@@ -240,6 +241,8 @@ def main():
                       help = "Enter an output folder. Default will be same folder as input file")
     parser.add_option("-r","--refseq",dest="refseq",action = 'store_true', default=False,
                       help = "If flagged will write output by refseq ID and not common name")
+    parser.add_option("-c","--control",dest="control",action = 'store_true', default=False,
+                      help = "If flagged will subtract input from sample signal")
 
     #RETRIEVING FLAGS
     (options,args) = parser.parse_args()
@@ -287,7 +290,7 @@ def main():
     else:
         transcribedFile = ''
 
-    enhancerToGeneTable,geneToEnhancerTable,withGenesTable = mapEnhancerToGene(annotFile,enhancerFile,uniqueGenes=True,byRefseq=options.refseq, transcribedFile=transcribedFile)
+    enhancerToGeneTable,geneToEnhancerTable,withGenesTable = mapEnhancerToGene(annotFile,enhancerFile, uniqueGenes=True, byRefseq=options.refseq, subtractInput=options.control, transcribedFile=transcribedFile)
 
     #Writing enhancer output
     enhancerFileName = enhancerFile.split('/')[-1].split('.')[0]

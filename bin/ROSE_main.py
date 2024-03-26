@@ -460,7 +460,6 @@ def main():
 
 
     if options.control:
-
         rankbyName = options.rankby.split('/')[-1]
         controlName = options.control.split('/')[-1]
         cmd = 'ROSE_callSuper.R %s %s %s %s' % (outFolder,outputFile1,inputName,controlName)
@@ -477,12 +476,14 @@ def main():
     superTableFile = "%s/%s_SuperStitched.table.txt" % (outFolder,inputName)
     allTableFile = "%s/%s_AllStitched.table.txt" % (outFolder,inputName)
 
+    suffixScript = ''
+    if options.control: suffixScript = '-c'
     if options.custom_genome:
-        cmd1 = "ROSE_geneMapper.py --custom %s -i %s -r TRUE" % (options.custom_genome,superTableFile)
-        cmd2 = "ROSE_geneMapper.py --custom %s -i %s -r TRUE" % (options.custom_genome,allTableFile)
+        cmd1 = "ROSE_geneMapper.py --custom %s -i %s -r TRUE %s" % (options.custom_genome,superTableFile,suffixScript)
+        cmd2 = "ROSE_geneMapper.py --custom %s -i %s -r TRUE %s " % (options.custom_genome,allTableFile,suffixScript)
     else:
-        cmd1 = "ROSE_geneMapper.py -g %s -i %s -r TRUE" % (genome,superTableFile)
-        cmd2 = "ROSE_geneMapper.py -g %s -i %s -r TRUE" % (genome,allTableFile)
+        cmd1 = "ROSE_geneMapper.py -g %s -i %s -r TRUE %s" % (genome,superTableFile,suffixScript)
+        cmd2 = "ROSE_geneMapper.py -g %s -i %s -r TRUE %s" % (genome,allTableFile,suffixScript)
 
     #gene mapper for super-stitched peaks
     print(cmd1)
