@@ -18,7 +18,7 @@ CLONED using SOURCETREE from: https://bitbucket.org/young_computation/rose/src/m
 
 	* ROSE is executable independent of software directory location.
 	* ROSE is compatible with python3
-	* ROSE as a docker image ghcr.io/stjude/rose:latest
+	* ROSE as a docker image: ghcr.io/stjude/abralab/rose:latest
 
 1. REQUIREMENTS:
 
