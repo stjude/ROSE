@@ -78,7 +78,7 @@ def mapEnhancerToGene(annotFile,enhancerFile,transcribedFile='',uniqueGenes=True
     for line in enhancerTable[6:]:
 
         enhancerString = '%s:%s-%s' % (line[1],line[2],line[3])
-        enhancerSignal = int(line[6])
+        enhancerSignal = int(float(line[6]))
         if subtractInput: enhancerSignal = int(float(line[6]) - float(line[7]))
 
         enhancerLocus = ROSE_utils.Locus(line[1],line[2],line[3],'.',line[0])
