@@ -73,7 +73,7 @@ def mapEnhancerToGene(annotFile,enhancerFile,transcribedFile='',uniqueGenes=True
     geneToEnhancerTable = [['GENE_NAME','REFSEQ_ID','PROXIMAL_STITCHED_PEAKS']]
 
     #have all information
-    signalWithGenes = [['GENE_NAME', 'REFSEQ_ID','PROXIMAL_STITCHED_PEAKS', 'SIGNAL']]
+    signalWithGenes = [['GENE_NAME', 'REFSEQ_ID', 'PROXIMAL_STITCHED_PEAKS', 'SIGNAL']]
 
     for line in enhancerTable[6:]:
 
@@ -129,14 +129,6 @@ def mapEnhancerToGene(annotFile,enhancerFile,transcribedFile='',uniqueGenes=True
 
             #get absolute distance to enhancer center
             distList = [abs(enhancerCenter - startDict[geneID]['start'][0]) for geneID in allEnhancerGenes]
-            #get the ID and convert to name
-            #print enhancerCenter - startDict[geneID]['start'][0]
-            #print distList.index(min(distList))
-            #print min(distList)
-            #print len(distList)
-	        #print len(allEnhancerGenes[distList.index(min(distList))])
-	        #print line
-	        #print len(startDict[allEnhancerGenes[distList.index(min(distList))]])
             closestGene = startDict[allEnhancerGenes[distList.index(min(distList))]]['name']
 
         #NOW WRITE THE ROW FOR THE ENHANCER TABLE
@@ -145,9 +137,6 @@ def mapEnhancerToGene(annotFile,enhancerFile,transcribedFile='',uniqueGenes=True
         if byRefseq:
             newEnhancerLine.append(','.join(ROSE_utils.uniquify([x for x in overlappingGenes])))
             newEnhancerLine.append(','.join(ROSE_utils.uniquify([x for x in proximalGenes])))
-            #print newEnhancerLine
-            #print len(allEnhancerGenes)
-            #print distList
             closestGene = allEnhancerGenes[distList.index(min(distList))]
             newEnhancerLine.append(closestGene)
         else:
@@ -157,6 +146,9 @@ def mapEnhancerToGene(annotFile,enhancerFile,transcribedFile='',uniqueGenes=True
             newEnhancerLine.append(closestGene)
 
 
+        #WRITE GENE TABLE
+        signalWithGenes.append([startDict[closestGene]['name'], closestGene, enhancerString, enhancerSignal])
+
         newEnhancerLine += line[-2:]
         enhancerToGeneTable.append(newEnhancerLine)
         #Now grab all overlapping and proximal genes for the gene ordered table
@@ -164,13 +156,11 @@ def mapEnhancerToGene(annotFile,enhancerFile,transcribedFile='',uniqueGenes=True
         overallGeneList +=overlappingGenes
         for refID in overlappingGenes:
             geneDict['overlapping'][refID].append(enhancerString)
-            geneDict['enhancerString'][enhancerString].append(enhancerSignal)
-        
+
 
         overallGeneList+=proximalGenes
         for refID in proximalGenes:
             geneDict['proximal'][refID].append(enhancerString)
-            geneDict['enhancerString'][enhancerString].append(enhancerSignal)
 
 
     #End loop through
@@ -197,8 +187,6 @@ def mapEnhancerToGene(annotFile,enhancerFile,transcribedFile='',uniqueGenes=True
         newLine = [geneName,refID,','.join(proxEnhancers)]
 
         
-        for eachEnhancer in proxEnhancers:
-            signalWithGenes.append([geneName,refID,eachEnhancer,ROSE_utils.uniquify(geneDict['enhancerString'][eachEnhancer])[0]])
         geneToEnhancerTable.append(newLine)
 
     #re-sort enhancerToGeneTable
