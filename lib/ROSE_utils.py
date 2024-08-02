@@ -132,7 +132,7 @@ def makeStartDict(annotFile,geneList = []):
         geneList = parseTable(geneList,'\t')
         geneList = [line[0] for line in geneList]
             
-    if annotFile.upper().count('REFSEQ') == 1:
+    if annotFile.upper().count('REFSEQ') >= 0:
         refseqTable,refseqDict = importRefseq(annotFile)
         if len(geneList) == 0:
             geneList = list(refseqDict.keys())
@@ -495,7 +495,7 @@ def makeTranscriptCollection(annotFile,upSearch,downSearch,window = 500,geneList
     takes in a refseqfile
     '''
 
-    if annotFile.upper().count('REFSEQ') == 1:
+    if annotFile.upper().count('REFSEQ') >= 0:
         refseqTable,refseqDict = importRefseq(annotFile)
         locusList = []
         ticker = 0
